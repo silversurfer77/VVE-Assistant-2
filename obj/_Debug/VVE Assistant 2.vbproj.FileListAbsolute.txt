@@ -1,0 +1,24 @@
+C:\Users\danku\source\repos\VVE Assistant 2\bin\Debug\VVE Assistant 2.exe.config
+C:\Users\danku\source\repos\VVE Assistant 2\bin\Debug\VVE Assistant 2.exe
+C:\Users\danku\source\repos\VVE Assistant 2\bin\Debug\VVE Assistant 2.pdb
+C:\Users\danku\source\repos\VVE Assistant 2\bin\Debug\VVE Assistant 2.xml
+C:\Users\danku\source\repos\VVE Assistant 2\bin\Debug\Graph3D.dll
+C:\Users\danku\source\repos\VVE Assistant 2\bin\Debug\MathNet.Numerics.dll
+C:\Users\danku\source\repos\VVE Assistant 2\bin\Debug\System.ValueTuple.dll
+C:\Users\danku\source\repos\VVE Assistant 2\bin\Debug\Graph3D.pdb
+C:\Users\danku\source\repos\VVE Assistant 2\bin\Debug\Graph3D.xml
+C:\Users\danku\source\repos\VVE Assistant 2\bin\Debug\MathNet.Numerics.xml
+C:\Users\danku\source\repos\VVE Assistant 2\bin\Debug\System.ValueTuple.xml
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assistant 2.vbproj.AssemblyReference.cache
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE_Assistant_2.frmPopOutEditor.resources
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE_Assistant_2.frmCamImport.resources
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE_Assistant_2.frmMain.resources
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE_Assistant_2.frmPayPal.resources
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE_Assistant_2.Resources.resources
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assistant 2.vbproj.GenerateResource.cache
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assistant 2.vbproj.CoreCompileInputs.cache
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assi.3A23ADDC.Up2Date
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assistant 2.exe
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assistant 2.xml
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assistant 2.pdb
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assistant 2.exe.config
