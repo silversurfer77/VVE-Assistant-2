@@ -914,6 +914,41 @@ Public Class frmMain
         Graph3D_VVE.Raster = Graph3D.Plot3D.Graph3D.eRaster.MainAxis
         Graph3D_VVE.AllowuserEdit = False
 
+
+
+        'Dim VVE_META As New clsGridManager(grdVVE, 0)
+        'tsVVE.Tag = VVE_META
+        'grdVVE.Tag = tsVVE
+
+        Dim TS As ToolStrip = CType(grdVVE.Tag, ToolStrip)
+        If TS IsNot Nothing Then
+            Dim GRD_MGR As clsGridManager = CType(TS.Tag, clsGridManager)
+            If GRD_MGR IsNot Nothing Then
+
+                'Dim o As String() = GRD_MGR.RowHeaders()
+
+                'Dim headers(GRD_MGR.DataSource.Columns.Count - 1) As String
+                'GRD_MGR.DataSource.Columns.CopyTo(headers, 0)
+
+
+                'Dim autoCompleteStringCollection As String() = GRD_MGR.DataSource.AsEnumerable().Select(Function(r) r.Field(Of String)(1)).ToArray()
+
+                'Dim headers(grdVVE.Columns.Count - 1) As String
+                'grdVVE.Columns.CopyTo()
+
+
+                Graph3D_VVE.AxisX_Breakpoints = GRD_MGR.ColumnHeaders
+                Graph3D_VVE.AxisY_Breakpoints = GRD_MGR.RowHeaders
+                Graph3D_VVE.AxisZ_TickInterval = 500
+
+
+            End If
+        End If
+
+
+
+
+
         Dim objDT_Old As DataTable = DirectCast(grdVVE.DataSource, DataTable)
         If objDT_Old Is Nothing Then
             HasData = False

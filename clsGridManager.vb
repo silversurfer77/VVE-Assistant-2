@@ -56,6 +56,24 @@
         End Set
     End Property
 
+    Public ReadOnly Property ColumnHeaders() As String()
+        Get
+            If _GRD Is Nothing Then
+                Return {}
+            End If
+            If _GRD.Columns.Count = 0 Then
+                Return {}
+            End If
+
+            Dim ARR(_GRD.Columns.Count - 1) As String
+            For i As Integer = 0 To _GRD.Columns.Count - 1
+                ARR(i) = _GRD.Columns(i).Name
+            Next
+
+            Return ARR
+        End Get
+    End Property
+
     Public Sub SetDatatable(ByVal DT As DataTable, Optional ByVal ROW_HEADERS() As String = Nothing)
 
         Dim COL_SCROLL As Integer = _GRD.HorizontalScrollingOffset
