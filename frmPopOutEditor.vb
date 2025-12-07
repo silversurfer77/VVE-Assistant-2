@@ -173,8 +173,8 @@ Public Class frmPopOutEditor
             Dim GRD_MGR_RPM As clsGridManager = DirectCast(grdZoneRPM.Tag, clsGridManager)
             Dim GRD_MGR_MAP As clsGridManager = DirectCast(grdZoneMAP.Tag, clsGridManager)
 
-            GRD_MGR_RPM.SetDatatable(grdZoneRPM.DataSource, GRD_MGR_RPM.RowHeaders)
-            GRD_MGR_MAP.SetDatatable(grdZoneMAP.DataSource, GRD_MGR_MAP.RowHeaders)
+            GRD_MGR_RPM.SetDatatable(grdZoneRPM.DataSource, GRD_MGR_RPM.RowHeaders_STR)
+            GRD_MGR_MAP.SetDatatable(grdZoneMAP.DataSource, GRD_MGR_MAP.RowHeaders_STR)
 
 
 

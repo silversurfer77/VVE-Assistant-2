@@ -5,19 +5,21 @@
 
 'Imports System.Windows.Forms.LinkLabel
 'Imports System.Windows.Forms.VisualStyles.VisualStyleElement
+Imports System.Security.AccessControl
 Imports System.Threading
 Imports Graph3D
-Imports VVE_Assistant_2.Datatable_Manager
+Imports Graph3D.Plot3D
+
 'Imports Microsoft.Win32
 
 ' To Do
 '
 ' The tune grid needs to highlight cells that have histo hits
 ' The tune grid needs a zone focus/selector
-'
-'
-'
-
+' Undo changes
+' Pick File Save Location
+' Live rezone / autorezone
+' Dark Theme
 
 
 
@@ -34,6 +36,8 @@ Public Class frmMain
         Update_Intake_Coeff_RowHeaders
         Update_Exhaust_Coeff_RowHeaders
         Update_Tune_RowHeaders
+        GRID_SELECTION_IN_PROGRESS
+        GRID_SELECTION_COMPLETE
     End Enum
 
     Private Enum enmWhichVVE
@@ -64,6 +68,8 @@ Public Class frmMain
             'SetUpTabAndGridTagRelationship()
 
             'My.Settings.HistoLow = System.Drawing.Color.Green
+
+            grdVVE.SelectionMode = DataGridViewSelectionMode.CellSelect
 
             SetupWidgetRelationships()
 
@@ -131,20 +137,20 @@ Public Class frmMain
 
 
 
-    Private Sub tabMain_SelectedIndexChanged(sender As Object, e As EventArgs) Handles tsTuneBtnHealColumns.SelectedIndexChanged
+    Private Sub tabMain_SelectedIndexChanged(sender As Object, e As EventArgs) Handles tabMain.SelectedIndexChanged
         Try
 
 
 
 
-            If tsTuneBtnHealColumns.SelectedTab.Equals(tabVVE) Then
+            If tabMain.SelectedTab.Equals(tabVVE) Then
                 ' send vve old to vve new was clicked
                 GetGridManager(grdVVE).ApplyRowHeaders()
 
                 FORM_STATE = enmFORM_STATE.Normal
 
 
-            ElseIf tsTuneBtnHealColumns.SelectedTab.Equals(tabVVECoeff) Then
+            ElseIf tabMain.SelectedTab.Equals(tabVVECoeff) Then
                 GetGridManager(grdVVEConst).ApplyRowHeaders()
                 GetGridManager(grdVVEMAP).ApplyRowHeaders()
                 GetGridManager(grdVVEMAP2).ApplyRowHeaders()
@@ -155,7 +161,7 @@ Public Class frmMain
 
                 FORM_STATE = enmFORM_STATE.Normal
 
-            ElseIf tsTuneBtnHealColumns.SelectedTab.Equals(tabInCoeff) Then
+            ElseIf tabMain.SelectedTab.Equals(tabInCoeff) Then
                 GetGridManager(grdVVEIntakeMAP).ApplyRowHeaders()
                 GetGridManager(grdVVEIntakeRPM).ApplyRowHeaders()
                 GetGridManager(grdVVEIntakeCam).ApplyRowHeaders()
@@ -163,7 +169,7 @@ Public Class frmMain
 
                 FORM_STATE = enmFORM_STATE.Normal
 
-            ElseIf tsTuneBtnHealColumns.SelectedTab.Equals(tabExCoeff) Then
+            ElseIf tabMain.SelectedTab.Equals(tabExCoeff) Then
                 GetGridManager(grdVVEExhaustMAP).ApplyRowHeaders()
                 GetGridManager(grdVVEExhaustRPM).ApplyRowHeaders()
                 GetGridManager(grdVVEExhaustExIn).ApplyRowHeaders()
@@ -172,7 +178,7 @@ Public Class frmMain
 
                 FORM_STATE = enmFORM_STATE.Normal
 
-            ElseIf tsTuneBtnHealColumns.SelectedTab.Equals(tabTune) Then
+            ElseIf tabMain.SelectedTab.Equals(tabTune) Then
                 GetGridManager(grdTune).ApplyRowHeaders()
                 'Coeff_to_BaseVVE(GetGridManager(grdTune))
 
@@ -391,7 +397,7 @@ Public Class frmMain
             ' for middle zones...see what zone you are in...
             Dim objZones As New clsZones(GetGridManager(grdZoneRPM).DataSource,
                                          GetGridManager(grdZoneMAP).DataSource,
-                                         GetGridManager(GRD).RowHeaders)
+                                         GetGridManager(GRD).RowHeaders_STR)
 
             If Not objZones.ReadyToRock Then
                 Exit Sub
@@ -404,7 +410,7 @@ Public Class frmMain
 
 
             Dim CURRENT_ZONE As Integer = objZones.WhatZoneAmI(CDbl(GRD.Columns(e.ColumnIndex).HeaderText),
-                                                               CDbl(GetGridManager(GRD).RowHeaders(e.RowIndex)))
+                                                               CDbl(GetGridManager(GRD).RowHeaders_STR(e.RowIndex)))
 
             Dim RIGHT_ZONE As Integer = CURRENT_ZONE
             Dim DOWN_ZONE As Integer = RIGHT_ZONE
@@ -451,7 +457,7 @@ Public Class frmMain
             'check what zone is directly to the right...
             If 0 < e.ColumnIndex And e.ColumnIndex < GRD.Columns.Count - 1 Then
                 RIGHT_ZONE = objZones.WhatZoneAmI(CDbl(GRD.Columns(e.ColumnIndex + 1).HeaderText),
-                                                  CDbl(GetGridManager(GRD).RowHeaders(e.RowIndex)))
+                                                  CDbl(GetGridManager(GRD).RowHeaders_STR(e.RowIndex)))
                 If CURRENT_ZONE <> RIGHT_ZONE Then
                     ' draw RIGHT border
                     e.Graphics.DrawLine(gridlinePen, v_topRightPoint, v_bottomRightPoint)
@@ -461,7 +467,7 @@ Public Class frmMain
             'check what zone is directly below...
             If 0 < e.RowIndex And e.RowIndex < GRD.Rows.Count - 1 Then
                 DOWN_ZONE = objZones.WhatZoneAmI(CDbl(GRD.Columns(e.ColumnIndex).HeaderText),
-                                                 CDbl(GetGridManager(GRD).RowHeaders(e.RowIndex + 1)))
+                                                 CDbl(GetGridManager(GRD).RowHeaders_STR(e.RowIndex + 1)))
                 If CURRENT_ZONE <> DOWN_ZONE Then
                     ' draw BOTTOM border
                     e.Graphics.DrawLine(gridlinePen, h_bottomleftPoint, h_bottomRightPoint)
@@ -540,7 +546,7 @@ Public Class frmMain
         Try
             ' commit the edits to the background datatable before calling the populategrid code
             Dim GRD_MGR As clsGridManager = GetGridManager(DirectCast(sender, DataGridView))
-            GRD_MGR.SetDatatable(DirectCast(GRD_MGR.Grid.DataSource, DataTable), GRD_MGR.RowHeaders)
+            GRD_MGR.SetDatatable(DirectCast(GRD_MGR.Grid.DataSource, DataTable), GRD_MGR.RowHeaders_STR)
 
             PopulateGrid(GRD_MGR, False)
         Catch ex As Exception
@@ -594,32 +600,32 @@ Public Class frmMain
         End Try
     End Sub
 
-    Private Sub tsVVEOldBtnSendTo_Click(sender As Object, e As EventArgs)
-        Try
-            Dim DT_OLD As DataTable = DirectCast(grdVVE.DataSource, DataTable)
-            If DT_OLD Is Nothing Then
-                Exit Sub
-            End If
-            If DT_OLD.Columns.Count = 0 Then
-                Exit Sub
-            End If
-            If DT_OLD.Rows.Count = 0 Then
-                Exit Sub
-            End If
+    'Private Sub tsVVEOldBtnSendTo_Click(sender As Object, e As EventArgs)
+    '    Try
+    '        Dim DT_OLD As DataTable = DirectCast(grdVVE.DataSource, DataTable)
+    '        If DT_OLD Is Nothing Then
+    '            Exit Sub
+    '        End If
+    '        If DT_OLD.Columns.Count = 0 Then
+    '            Exit Sub
+    '        End If
+    '        If DT_OLD.Rows.Count = 0 Then
+    '            Exit Sub
+    '        End If
 
-            'FORM_STATE = enmFORM_STATE.FixVVENewRowHeaders
+    '        'FORM_STATE = enmFORM_STATE.FixVVENewRowHeaders
 
-            Dim GRD_MGR_OLD As clsGridManager = GetGridManager(grdVVE)
-            'Dim GRD_MGR_NEW As clsGridManager = GetGridManager(grdVVENew)
+    '        Dim GRD_MGR_OLD As clsGridManager = GetGridManager(grdVVE)
+    '        'Dim GRD_MGR_NEW As clsGridManager = GetGridManager(grdVVENew)
 
-            'GRD_MGR_NEW.SetDatatable(GRD_MGR_OLD.DataSource, GRD_MGR_OLD.RowHeaders)
+    '        'GRD_MGR_NEW.SetDatatable(GRD_MGR_OLD.DataSource, GRD_MGR_OLD.RowHeaders)
 
-            Paint_3D_Graphs()
+    '        Paint_3D_Graphs()
 
-        Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Critical)
-        End Try
-    End Sub
+    '    Catch ex As Exception
+    '        MsgBox(ex.Message, MsgBoxStyle.Critical)
+    '    End Try
+    'End Sub
 
     Private Sub mnuHelpSupportBuyMeACoffee_Click_1(sender As Object, e As EventArgs) Handles mnuHelpSupportBuyMeACoffee.Click
         Try
@@ -812,7 +818,7 @@ Public Class frmMain
     End Sub
 
     Private Function GetActiveGrid() As DataGridView()
-        Dim tabRandom As TabPage = tsTuneBtnHealColumns.SelectedTab
+        Dim tabRandom As TabPage = tabMain.SelectedTab
 
         If tabRandom.Equals(tabHisto) Then
             Return {grdHisto}
@@ -908,43 +914,37 @@ Public Class frmMain
         ' -----------------
         ' VVE
         ' -----------------
+
+        Console.WriteLine("1) SelectionMode = " & grdVVE.SelectionMode.ToString)
+
+
         Dim obj3D_Old As New cls3D(Graph3D_VVE)
 
         obj3D_Old.Plot3D({{0, 0}, {0, 0}})
         Graph3D_VVE.Raster = Graph3D.Plot3D.Graph3D.eRaster.MainAxis
-        Graph3D_VVE.AllowuserEdit = False
+        Graph3D_VVE.AllowuserEdit = True
+        Graph3D_VVE.AxisX_Breakpoints = GetGridManager(grdVVE).ColumnHeaders
+        Graph3D_VVE.AxisY_Breakpoints = GetGridManager(grdVVE).RowHeaders_DBL
+        Graph3D_VVE.AxisZ_TickInterval = 500
+        Graph3D_VVE.DrawAxisLabels = False
+        Graph3D_VVE.DrawAxisLines = False
+
+        Console.WriteLine("2) SelectionMode = " & grdVVE.SelectionMode.ToString)
+        Graph3D_VVE.SetHighlightedPolygons(GetSelectionFromGrid(grdVVE))
+        Console.WriteLine("4) SelectionMode = " & grdVVE.SelectionMode.ToString)
 
 
 
-        'Dim VVE_META As New clsGridManager(grdVVE, 0)
-        'tsVVE.Tag = VVE_META
-        'grdVVE.Tag = tsVVE
-
-        Dim TS As ToolStrip = CType(grdVVE.Tag, ToolStrip)
-        If TS IsNot Nothing Then
-            Dim GRD_MGR As clsGridManager = CType(TS.Tag, clsGridManager)
-            If GRD_MGR IsNot Nothing Then
-
-                'Dim o As String() = GRD_MGR.RowHeaders()
-
-                'Dim headers(GRD_MGR.DataSource.Columns.Count - 1) As String
-                'GRD_MGR.DataSource.Columns.CopyTo(headers, 0)
+        'Graph3D_VVE.RPMZoneBoundaries = {1000, 2000, 2600, 3600}
+        Graph3D_VVE.RPMZoneBoundaries = clsLib.DT_To_1D_Array_DBL(GetGridManager(grdZoneRPM).DataSource)
 
 
-                'Dim autoCompleteStringCollection As String() = GRD_MGR.DataSource.AsEnumerable().Select(Function(r) r.Field(Of String)(1)).ToArray()
-
-                'Dim headers(grdVVE.Columns.Count - 1) As String
-                'grdVVE.Columns.CopyTo()
-
-
-                Graph3D_VVE.AxisX_Breakpoints = GRD_MGR.ColumnHeaders
-                Graph3D_VVE.AxisY_Breakpoints = GRD_MGR.RowHeaders
-                Graph3D_VVE.AxisZ_TickInterval = 500
-
-
-            End If
-        End If
-
+        'Graph3D_VVE.MAPZoneBoundaryMatrix = {{20, 40, 60, 80, 90}, ' Zone 0-1
+        '                                     {15, 25, 35, 55, 80}, ' Zone 1-2
+        '                                     {30, 40, 50, 75, 90}, ' Zone 2-3
+        '                                     {25, 35, 45, 65, 75}  ' Zone 3-4
+        '                                     }
+        Graph3D_VVE.MAPZoneBoundaryMatrix = clsLib.DT_To_2D_Array_DBL(GetGridManager(grdZoneMAP).DataSource)
 
 
 
@@ -973,8 +973,22 @@ Public Class frmMain
 
         obj3D_New.Plot3D({{0, 0}, {0, 0}})
         Graph3D_Tune.Raster = Graph3D.Plot3D.Graph3D.eRaster.MainAxis
+        Graph3D_Tune.AllowuserEdit = True
+        Graph3D_Tune.AxisX_Breakpoints = GetGridManager(grdVVE).ColumnHeaders
+        Graph3D_Tune.AxisY_Breakpoints = GetGridManager(grdVVE).RowHeaders_DBL
+        Graph3D_Tune.AxisZ_TickInterval = 500
+        Graph3D_Tune.DrawAxisLabels = True
+        Graph3D_Tune.DrawAxisLines = True
+        Graph3D_Tune.RPMZoneBoundaries = Graph3D_VVE.RPMZoneBoundaries
+        Graph3D_Tune.MAPZoneBoundaryMatrix = Graph3D_VVE.MAPZoneBoundaryMatrix
 
+
+        '-------------------------------------------------------------------------------------------------------------------------
+        ' might want to rethink this as it sets the datatable, etc, might be a performance bummer
         Dim objDT_New As DataTable = DisplayVVE() 'DirectCast(grdTune.DataSource, DataTable)
+        '--------------------------------------------------------------------------------------------------------------------
+
+        Console.WriteLine("SelectionMode = " & grdVVE.SelectionMode.ToString)
 
         If objDT_New Is Nothing Then
             HasData = False
@@ -988,6 +1002,85 @@ Public Class frmMain
         End If
         ' ---------------------------------------------------------------------------------------
     End Sub
+
+    Private Function GetSelectionFromGrid(dgv As DataGridView) As List(Of Point)
+
+        Dim result As New List(Of Point)
+
+        If dgv.SelectedCells.Count = 0 Then
+            Return result
+        End If
+
+        ' Collect unique column and row indices
+        Dim selectedX As New HashSet(Of Integer)()
+        Dim selectedY As New HashSet(Of Integer)()
+
+        For Each cell As DataGridViewCell In dgv.SelectedCells
+            selectedX.Add(cell.ColumnIndex)
+            selectedY.Add(cell.RowIndex)
+        Next
+
+        ' Convert these into valid polygon coordinates
+        ' Polygons exist for X = 0 → (XCount-2), Y = 0 → (YCount-2)
+        Dim maxX As Integer = dgv.ColumnCount - 2
+        Dim maxY As Integer = dgv.RowCount - 2
+
+        For Each x In selectedX
+            For Each y In selectedY
+
+                ' Make sure polygon indices exist
+                If x >= 0 AndAlso x <= maxX AndAlso
+               y >= 0 AndAlso y <= maxY Then
+
+                    result.Add(New Point(y, x))
+
+                End If
+            Next
+        Next
+
+        Return result
+
+    End Function
+
+
+
+
+    Private Sub grdVVE_CellStateChanged(sender As Object, e As DataGridViewCellStateChangedEventArgs) Handles grdVVE.CellStateChanged
+        Try
+
+            Graph3D_VVE.SetHighlightedPolygons(GetSelectionFromGrid(grdVVE))
+            Graph3D_VVE.Invalidate()
+
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical)
+        End Try
+    End Sub
+
+
+
+    'Private Sub grdVVE_MouseUp(sender As Object, e As MouseEventArgs) Handles grdVVE.MouseUp
+
+    '    Try
+    '        FORM_STATE = enmFORM_STATE.GRID_SELECTION_COMPLETE
+
+    '    Catch ex As Exception
+    '        MsgBox(ex.Message, MsgBoxStyle.Critical)
+    '    End Try
+
+    'End Sub
+
+    'Private Sub grdVVE_MouseDown(sender As Object, e As MouseEventArgs) Handles grdVVE.MouseDown
+
+    '    Try
+    '        FORM_STATE = enmFORM_STATE.GRID_SELECTION_IN_PROGRESS
+    '    Catch ex As Exception
+    '        MsgBox(ex.Message, MsgBoxStyle.Critical)
+    '    End Try
+
+    'End Sub
+
+
+
 
     Private Sub PopulateGrid(ByVal GRD_MGR As clsGridManager, ByVal FROM_CLIPBOARD As Boolean)
 
@@ -1011,7 +1104,7 @@ Public Class frmMain
         If FROM_CLIPBOARD Then
             DT = clsLib.ClipboardToDatatable(ROW_HEADERS, NUMERIC_COL_HEADERS)
         Else
-            ROW_HEADERS = GRD_MGR.RowHeaders
+            ROW_HEADERS = GRD_MGR.RowHeaders_STR
             DT = GRD_MGR.DataSource()
         End If
 
@@ -1033,8 +1126,9 @@ Public Class frmMain
 
 
         ' wrap both of these calls into Try/Catch blocks since they are calling 3rd party code. If this fails, at least allow the cell painting and zones to render
-        If GRD_MGR.Grid.Equals(grdVVE) Then
+        If GRD_MGR.Grid.Equals(grdVVE) Or GRD_MGR.Grid.Equals(grdZoneRPM) Or GRD_MGR.Grid.Equals(grdZoneMAP) Then
             Try
+                grdVVE.SelectionMode = DataGridViewSelectionMode.CellSelect
                 Paint_3D_Graphs()
             Catch ex As Exception
                 MsgBox("Error rendering 3D chart: " & ex.Message, MsgBoxStyle.Critical)
@@ -1045,7 +1139,7 @@ Public Class frmMain
         If GRD_MGR.Grid.Equals(grdVVE) Or GRD_MGR.Grid.Equals(grdZoneRPM) Or GRD_MGR.Grid.Equals(grdZoneMAP) Then
             Try
                 CalcCoeffFromBaseVVE(GetGridManager(grdVVE).DataSource,
-                                     GetGridManager(grdVVE).RowHeaders, ' it is critical to pass in the VVE headers (and not use GRD_MGR since it could also be from the grdZone*) from the base VVE table (NOT THE HISTO HEADERS since we cannot garuntee they match at this point)
+                                     GetGridManager(grdVVE).RowHeaders_STR, ' it is critical to pass in the VVE headers (and not use GRD_MGR since it could also be from the grdZone*) from the base VVE table (NOT THE HISTO HEADERS since we cannot garuntee they match at this point)
                                      False)
 
                 GRD_MGR.Grid.Invalidate()
@@ -1081,22 +1175,22 @@ Public Class frmMain
         If NEW_ROW_ONLY Then
 
             GetGridManager(grdVVEConst).UpdateRow(1, COEFF(0).Rows(0))
-            GetGridManager(grdVVEConst).SetDatatable(GetGridManager(grdVVEConst).DataSource, GetGridManager(grdVVEConst).RowHeaders)
+            GetGridManager(grdVVEConst).SetDatatable(GetGridManager(grdVVEConst).DataSource, GetGridManager(grdVVEConst).RowHeaders_STR)
 
             GetGridManager(grdVVEMAP).UpdateRow(1, COEFF(1).Rows(0))
-            GetGridManager(grdVVEMAP).SetDatatable(GetGridManager(grdVVEMAP).DataSource, GetGridManager(grdVVEMAP).RowHeaders)
+            GetGridManager(grdVVEMAP).SetDatatable(GetGridManager(grdVVEMAP).DataSource, GetGridManager(grdVVEMAP).RowHeaders_STR)
 
             GetGridManager(grdVVEMAP2).UpdateRow(1, COEFF(2).Rows(0))
-            GetGridManager(grdVVEMAP2).SetDatatable(GetGridManager(grdVVEMAP2).DataSource, GetGridManager(grdVVEMAP2).RowHeaders)
+            GetGridManager(grdVVEMAP2).SetDatatable(GetGridManager(grdVVEMAP2).DataSource, GetGridManager(grdVVEMAP2).RowHeaders_STR)
 
             GetGridManager(grdVVERPM).UpdateRow(1, COEFF(3).Rows(0))
-            GetGridManager(grdVVERPM).SetDatatable(GetGridManager(grdVVERPM).DataSource, GetGridManager(grdVVERPM).RowHeaders)
+            GetGridManager(grdVVERPM).SetDatatable(GetGridManager(grdVVERPM).DataSource, GetGridManager(grdVVERPM).RowHeaders_STR)
 
             GetGridManager(grdVVERPM2).UpdateRow(1, COEFF(4).Rows(0))
-            GetGridManager(grdVVERPM2).SetDatatable(GetGridManager(grdVVERPM2).DataSource, GetGridManager(grdVVERPM2).RowHeaders)
+            GetGridManager(grdVVERPM2).SetDatatable(GetGridManager(grdVVERPM2).DataSource, GetGridManager(grdVVERPM2).RowHeaders_STR)
 
             GetGridManager(grdVVEMAPRPM).UpdateRow(1, COEFF(5).Rows(0))
-            GetGridManager(grdVVEMAPRPM).SetDatatable(GetGridManager(grdVVEMAPRPM).DataSource, GetGridManager(grdVVEMAPRPM).RowHeaders)
+            GetGridManager(grdVVEMAPRPM).SetDatatable(GetGridManager(grdVVEMAPRPM).DataSource, GetGridManager(grdVVEMAPRPM).RowHeaders_STR)
 
 
         Else
@@ -1126,7 +1220,7 @@ Public Class frmMain
 
             Dim objMath As New clsMath(SMALL_ZONE_WARN)
             Dim COEFF() As DataTable = objMath.FindAllIntakeCoefficients(DT_VVE, DT_VVE_INTAKE,
-                                                                         GetGridManager(grdVVE).RowHeaders,
+                                                                         GetGridManager(grdVVE).RowHeaders_STR,
                                                                          DirectCast(grdZoneRPM.DataSource, DataTable),
                                                                          DirectCast(grdZoneMAP.DataSource, DataTable),
                                                                          True,
@@ -1170,7 +1264,7 @@ Public Class frmMain
 
             Dim objMath As New clsMath(SMALL_ZONE_WARN)
             Dim COEFF() As DataTable = objMath.FindAllExhaustCoefficients(DT_VVE, DT_VVE_EXHAUST,
-                                                                          GetGridManager(grdVVE).RowHeaders,
+                                                                          GetGridManager(grdVVE).RowHeaders_STR,
                                                                           DirectCast(grdZoneRPM.DataSource, DataTable),
                                                                           DirectCast(grdZoneMAP.DataSource, DataTable),
                                                                           True,
@@ -1471,6 +1565,8 @@ Public Class frmMain
             Dim GRD_MGR As clsGridManager = GetGridManager(grdTune)
             GRD_MGR.DecimalPlaces = 0
             GRD_MGR.SetDatatable(DT_FINAL, ROW_HEADERS)
+
+            Console.WriteLine("SelectionMode = " & grdVVE.SelectionMode.ToString)
         End If
 
         ' this will be used to paint the final VVE 3D chart
@@ -1482,7 +1578,7 @@ Public Class frmMain
         Dim DT_OLD As New DataTable
         Dim DT_NEW As New DataTable
         Dim DT_PASTE_SPECIAL As New DataTable
-        Dim ROW_HEADERS() As String = GetGridManager(grdHisto).RowHeaders
+        Dim ROW_HEADERS() As String = GetGridManager(grdHisto).RowHeaders_STR
 
         CalcVVE(0, DT_OLD, ROW_HEADERS)
         CalcVVE(1, DT_NEW, ROW_HEADERS)
@@ -1508,7 +1604,7 @@ Public Class frmMain
         'Dim DT_FINAL As DataTable = DT_HISTO.Clone
         DT_FINAL = DT_HISTO.Clone
         'Dim ROW_HEADERS() As String = GetGridManager(grdHisto).RowHeaders
-        ROW_HEADERS = GetGridManager(grdHisto).RowHeaders
+        ROW_HEADERS = GetGridManager(grdHisto).RowHeaders_STR
         Dim objZones As New clsZones(GetGridManager(grdZoneRPM).DataSource, GetGridManager(grdZoneMAP).DataSource, ROW_HEADERS)
         Dim objMath As New clsMath(SMALL_ZONE_WARN)
 
@@ -1705,7 +1801,7 @@ Public Class frmMain
                 DIR = clsMath.INTERPOLATE_DIRECTION.Horizontal
             End If
 
-            Dim ROW_HEADERS() As String = GetGridManager(grdHisto).RowHeaders
+            Dim ROW_HEADERS() As String = GetGridManager(grdHisto).RowHeaders_STR
 
             Dim objMath As New clsMath(SMALL_ZONE_WARN)
             GetGridManager(grdTune).SetDatatable(objMath.InterpolateSelectedCells(grdTune.SelectedCells,
@@ -1725,7 +1821,7 @@ Public Class frmMain
     Private Sub tsTuneBtnSmooth_Click(sender As Object, e As EventArgs) Handles tsTuneBtnSmooth.Click
         Try
             Dim objMath As New clsMath(SMALL_ZONE_WARN)
-            Dim ROW_HEADERS() As String = GetGridManager(grdHisto).RowHeaders
+            Dim ROW_HEADERS() As String = GetGridManager(grdHisto).RowHeaders_STR
 
             GetGridManager(grdTune).SetDatatable(objMath.SmoothSelectedCells(grdTune.SelectedCells,
                                                                              GetGridManager(grdTune).DataSource(False)),
@@ -1770,7 +1866,7 @@ Public Class frmMain
             Dim DT_VVE_NEW_RAW As DataTable = clsLib.PasteSpecialMultiplyPercent_Datatables(DT_NEW, DT_PASTE_SPECIAL)
 
 
-            CalcCoeffFromBaseVVE(DT_VVE_NEW_RAW, GetGridManager(grdHisto).RowHeaders, True)
+            CalcCoeffFromBaseVVE(DT_VVE_NEW_RAW, GetGridManager(grdHisto).RowHeaders_STR, True)
 
             ' refresh the current view
             tsTuneMnuViewVVENew_Click(Nothing, Nothing)
@@ -1802,15 +1898,15 @@ Public Class frmMain
     Public Sub UpdateZonesFromChildForm(ByVal DT_RPM As DataTable, ByVal DT_MAP As DataTable)
 
         Dim GRD_MGR_RPM As clsGridManager = GetGridManager(grdZoneRPM)
-        Dim ROW_HEADERS_RPM() As String = GRD_MGR_RPM.RowHeaders
+        Dim ROW_HEADERS_RPM() As String = GRD_MGR_RPM.RowHeaders_STR
         GRD_MGR_RPM.SetDatatable(DT_RPM, ROW_HEADERS_RPM)
 
         Dim GRD_MGR_MAP As clsGridManager = GetGridManager(grdZoneMAP)
-        Dim ROW_HEADERS_MAP() As String = GRD_MGR_MAP.RowHeaders
+        Dim ROW_HEADERS_MAP() As String = GRD_MGR_MAP.RowHeaders_STR
         GRD_MGR_MAP.SetDatatable(DT_MAP, ROW_HEADERS_MAP)
 
         CalcCoeffFromBaseVVE(GetGridManager(grdVVE).DataSource,
-                     GetGridManager(grdVVE).RowHeaders, ' it is critical to pass in the VVE headers (and not use GRD_MGR since it could also be from the grdZone*) from the base VVE table (NOT THE HISTO HEADERS since we cannot garuntee they match at this point)
+                     GetGridManager(grdVVE).RowHeaders_STR, ' it is critical to pass in the VVE headers (and not use GRD_MGR since it could also be from the grdZone*) from the base VVE table (NOT THE HISTO HEADERS since we cannot garuntee they match at this point)
                      True)
 
         grdZoneRPM.Invalidate()
@@ -1831,7 +1927,7 @@ Public Class frmMain
             ' 1) Re-calc coefficients
             Try
                 CalcCoeffFromBaseVVE(GetGridManager(grdVVE).DataSource,
-                                     GetGridManager(grdVVE).RowHeaders, ' it is critical to pass in the VVE headers (and not use GRD_MGR since it could also be from the grdZone*) from the base VVE table (NOT THE HISTO HEADERS since we cannot garuntee they match at this point)
+                                     GetGridManager(grdVVE).RowHeaders_STR, ' it is critical to pass in the VVE headers (and not use GRD_MGR since it could also be from the grdZone*) from the base VVE table (NOT THE HISTO HEADERS since we cannot garuntee they match at this point)
                                      False)
             Catch ex As Exception
                 If mnuOptionsVerlonModeSDPatch.Checked Then

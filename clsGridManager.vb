@@ -1,4 +1,6 @@
-﻿Public Class clsGridManager
+﻿Imports System.Runtime.Remoting.Metadata
+
+Public Class clsGridManager
 
     Private _GRD As DataGridView
     Private _DECIMAL_PLACES As Integer = -1
@@ -47,7 +49,7 @@
         End Set
     End Property
 
-    Public Property RowHeaders() As String()
+    Public Property RowHeaders_STR() As String()
         Get
             Return _ROW_HEADERS
         End Get
@@ -56,7 +58,34 @@
         End Set
     End Property
 
-    Public ReadOnly Property ColumnHeaders() As String()
+    Public ReadOnly Property RowHeaders_DBL() As Double()
+        Get
+            If _GRD Is Nothing Then
+                Return {}
+            End If
+            If _GRD.Rows.Count = 0 Then
+                Return {}
+            End If
+
+            If _ROW_HEADERS Is Nothing Then
+                Return {}
+            End If
+
+
+            Dim ARR(_ROW_HEADERS.Length - 1) As Double
+            For i As Integer = 0 To _ROW_HEADERS.Length - 1
+                If IsNumeric(_ROW_HEADERS(i)) Then
+                    ARR(i) = _ROW_HEADERS(i)
+                Else
+                    ARR(i) = 0.0
+                End If
+            Next
+
+            Return ARR
+        End Get
+    End Property
+
+    Public ReadOnly Property ColumnHeaders() As Double()
         Get
             If _GRD Is Nothing Then
                 Return {}
@@ -65,9 +94,14 @@
                 Return {}
             End If
 
-            Dim ARR(_GRD.Columns.Count - 1) As String
+            Dim ARR(_GRD.Columns.Count - 1) As Double
             For i As Integer = 0 To _GRD.Columns.Count - 1
-                ARR(i) = _GRD.Columns(i).Name
+
+                If IsNumeric(_GRD.Columns(i).Name) Then
+                    ARR(i) = CDbl(_GRD.Columns(i).Name)
+                Else
+                    ARR(i) = 0.0
+                End If
             Next
 
             Return ARR
@@ -94,6 +128,16 @@
 
         ' resize all the columns
         ResizeColumns()
+
+
+        With _GRD
+            .MultiSelect = True
+            .ReadOnly = False           ' required for CellSelect
+            .EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2
+            .SelectionMode = DataGridViewSelectionMode.CellSelect
+        End With
+
+        Debug.WriteLine("SelectionMode = " & _GRD.SelectionMode.ToString())
 
         'redraw
         '_GRD.Invalidate()

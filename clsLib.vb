@@ -503,20 +503,23 @@ Public Class clsLib
     End Sub
 
     Public Shared Function DT_To_2D_Array(ByVal DT_IN As DataTable) As Integer(,)
-        Dim VVE(DT_IN.Rows.Count - 1, DT_IN.Columns.Count - 1) As Integer
+        If DT_IN Is Nothing Then
+            Return Nothing
+        End If
+        If DT_IN.Rows.Count = 0 Then
+            Return Nothing
+        End If
+        If DT_IN.Columns.Count = 0 Then
+            Return Nothing
+        End If
 
+        Dim VVE(DT_IN.Rows.Count - 1, DT_IN.Columns.Count - 1) As Integer
 
         Dim TEMP_OBJ As Object = Nothing
         Dim RESULT As Integer = 0
 
         For i As Integer = 0 To DT_IN.Rows.Count - 1
             For j As Integer = 0 To DT_IN.Columns.Count - 1
-                'If IsNumeric(DT_IN.Rows(i).Item(j)) Then
-                '    VVE(i, j) = CInt(DT_IN.Rows(i).Item(j))
-                'Else
-                '    VVE(i, j) = 0
-                'End If
-
 
 
                 TEMP_OBJ = DT_IN.Rows(i).Item(j)
@@ -530,6 +533,71 @@ Public Class clsLib
 
         Return VVE
     End Function
+
+    Public Shared Function DT_To_2D_Array_DBL(ByVal DT_IN As DataTable) As Double(,)
+        ' this is used to pass in MAP zone data to the 3D chart.
+        ' the ROW and COL loops are reversed as compared to DT_To_2D_Array()!!!
+
+        If DT_IN Is Nothing Then
+            Return Nothing
+        End If
+        If DT_IN.Rows.Count = 0 Then
+            Return Nothing
+        End If
+        If DT_IN.Columns.Count = 0 Then
+            Return Nothing
+        End If
+
+        Dim VVE(DT_IN.Columns.Count - 1, DT_IN.Rows.Count - 1) As Double
+
+        Dim TEMP_OBJ As Object = Nothing
+        Dim RESULT As Integer = 0
+
+        For i As Integer = 0 To DT_IN.Columns.Count - 1
+            For j As Integer = 0 To DT_IN.Rows.Count - 1
+
+                TEMP_OBJ = DT_IN.Rows(i).Item(j)
+                RESULT = 0
+
+                Double.TryParse(Math.Round(TEMP_OBJ, 2).ToString, RESULT)
+                VVE(j, i) = RESULT
+            Next
+        Next
+
+        Return VVE
+    End Function
+
+    Public Shared Function DT_To_1D_Array_DBL(ByVal DT_IN As DataTable) As Double()
+        ' this is used to pass in MAP zone data to the 3D chart.
+        ' the ROW and COL loops are reversed as compared to DT_To_2D_Array()!!!
+
+        If DT_IN Is Nothing Then
+            Return Nothing
+        End If
+        If DT_IN.Rows.Count <> 1 Then
+            Return Nothing
+        End If
+        If DT_IN.Columns.Count = 0 Then
+            Return Nothing
+        End If
+
+        Dim VVE(DT_IN.Columns.Count - 1) As Double
+
+        Dim TEMP_OBJ As Object = Nothing
+        Dim RESULT As Integer = 0
+
+        For i As Integer = 0 To DT_IN.Columns.Count - 1
+
+            TEMP_OBJ = DT_IN.Rows(0).Item(i)
+            RESULT = 0
+
+            Double.TryParse(Math.Round(TEMP_OBJ, 2).ToString, RESULT)
+            VVE(i) = RESULT
+        Next
+
+        Return VVE
+    End Function
+
 
     Public Shared Function Verify_DTs_Match(ByVal DT_OLD As DataTable, ByVal DT_NEW As DataTable, ByRef ERR_REASON As String) As Boolean
         If DT_OLD Is Nothing Then
