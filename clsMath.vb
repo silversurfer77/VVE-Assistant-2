@@ -1,4 +1,5 @@
-﻿Imports Graph3D
+﻿Imports System.Security.Policy
+Imports Graph3D
 Imports MathNet
 Imports MathNet.Numerics
 
@@ -1470,24 +1471,6 @@ Public Class clsMath
     End Function
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     Private Sub SmallZoneWarn(ByVal RPM_LEN As Integer, ByVal MAP_LEN As Integer)
 
 
@@ -1526,6 +1509,236 @@ Public Class clsMath
 
 
     End Sub
+
+
+
+
+
+
+
+
+    Public Function CreateVVEFromCoeffAndBreakpoints(ByVal COEFF_CONST As DataTable,
+                                                     ByVal COEFF_MAP As DataTable,
+                                                     ByVal COEFF_MAP2 As DataTable,
+                                                     ByVal COEFF_RPM As DataTable,
+                                                     ByVal COEFF_RPM2 As DataTable,
+                                                     ByVal COEFF_MAPRPM As DataTable,
+                                                     ByVal DT_RPM_ZONE_DEF As DataTable,
+                                                     ByVal DT_MAP_ZONE_DEF As DataTable,
+                                                     ByVal MAP_BREAKPOINTS() As String,
+                                                     ByVal RPM_BREAKPOINTS() As String,
+                                                     ByVal VVE_RAW_FROM_EDITOR As DataTable,
+                                                     ByVal VERLON_MODE As Boolean) As DataTable
+
+        ' since we do not know if the breakpoints from the SCANNER match the EDITOR
+        ' we wil use the coefficients and the breakpoints to calc a VVE table with the proper breakpoints
+
+        Dim DT_VVE_CORRECTED_BREAKPOINTS As New DataTable
+
+        For i As Integer = 0 To RPM_BREAKPOINTS.Length - 1
+            DT_VVE_CORRECTED_BREAKPOINTS.Columns.Add(RPM_BREAKPOINTS(i), GetType(Decimal))
+        Next
+
+        Dim objZones As New clsZones(DT_RPM_ZONE_DEF, DT_MAP_ZONE_DEF, MAP_BREAKPOINTS)
+        Dim NEW_ROW As DataRow
+        Dim CURRENT_ZONE As Integer = -1
+        Dim ConstCoeff As Double = 0.0
+        Dim MAPCoeff As Double = 0.0
+        Dim MAP2Coeff As Double = 0.0
+        Dim RPMCoeff As Double = 0.0
+        Dim RPM2Coeff As Double = 0.0
+        Dim MAPRPMCoeff As Double = 0.0
+
+        Dim AirMass As Double = 0.0
+
+
+
+        For i As Integer = 0 To MAP_BREAKPOINTS.Length - 1
+            NEW_ROW = DT_VVE_CORRECTED_BREAKPOINTS.NewRow()
+
+            For j As Integer = 0 To RPM_BREAKPOINTS.Length - 1
+
+                CURRENT_ZONE = objZones.WhatZoneAmI(RPM_BREAKPOINTS(j), MAP_BREAKPOINTS(i))
+
+                ' ROW 0 = VVE OLD
+                ' ROW 1 = VVE NEW
+                ConstCoeff = CDbl(COEFF_CONST.Rows(0).Item(CURRENT_ZONE))
+                MAPCoeff = CDbl(COEFF_MAP.Rows(0).Item(CURRENT_ZONE))
+                MAP2Coeff = CDbl(COEFF_MAP2.Rows(0).Item(CURRENT_ZONE))
+                RPMCoeff = CDbl(COEFF_RPM.Rows(0).Item(CURRENT_ZONE))
+                RPM2Coeff = CDbl(COEFF_RPM2.Rows(0).Item(CURRENT_ZONE))
+                MAPRPMCoeff = CDbl(COEFF_MAPRPM.Rows(0).Item(CURRENT_ZONE))
+
+
+
+                AirMass = CalcVVEAirmass(ConstCoeff,
+                                            MAPCoeff,
+                                            MAP2Coeff,
+                                            RPMCoeff,
+                                            RPM2Coeff,
+                                            MAPRPMCoeff,
+                                            CDbl(MAP_BREAKPOINTS(i)),
+                                            CDbl(RPM_BREAKPOINTS(j)),
+                                            VERLON_MODE)
+
+
+
+                NEW_ROW(j) = AirMass
+
+            Next
+            DT_VVE_CORRECTED_BREAKPOINTS.Rows.Add(NEW_ROW)
+        Next
+
+        Return DT_VVE_CORRECTED_BREAKPOINTS
+    End Function
+
+
+
+
+
+
+    Public Function InterpolateInteriorMAP(ByVal DT As DataTable) As DataTable
+
+        For c As Integer = 0 To DT.Columns.Count - 1
+
+            Dim startVal As Double = 0
+            Dim startRow As Integer = -1
+            Dim haveStart As Boolean = False
+
+            Dim r As Integer = 0
+            While r < DT.Rows.Count
+
+                Dim cur As Double = CDbl(DT.Rows(r)(c))
+
+                If cur <> 0 Then
+                    If Not haveStart Then
+                        ' first non-zero in this column
+                        startVal = cur
+                        startRow = r
+                        haveStart = True
+                    Else
+                        ' found end of a gap
+                        Dim endVal As Double = cur
+                        Dim endRow As Integer = r
+                        Dim steps As Integer = endRow - startRow
+
+                        If steps > 1 Then
+                            For k As Integer = startRow + 1 To endRow - 1
+                                Dim t As Double = (k - startRow) / steps
+                                DT.Rows(k)(c) = startVal + (endVal - startVal) * t
+                            Next
+                        End If
+
+                        startVal = endVal
+                        startRow = r
+                    End If
+                End If
+
+                r += 1
+            End While
+
+        Next
+
+        Return DT
+    End Function
+
+
+
+
+
+    Public Function InterpolateOneRPMValue(ByVal DT As DataTable) As DataTable
+
+        For r As Integer = 0 To DT.Rows.Count - 1
+
+            Dim c As Integer = 0
+            While c < DT.Columns.Count - 2
+
+                Dim a As Double = CDbl(DT.Rows(r)(c))
+                Dim b As Double = CDbl(DT.Rows(r)(c + 1))
+                Dim d As Double = CDbl(DT.Rows(r)(c + 2))
+
+                ' pattern: nonzero, zero, nonzero => exactly 1-gap
+                If a <> 0 AndAlso b = 0 AndAlso d <> 0 Then
+                    DT.Rows(r)(c + 1) = (a + d) / 2.0
+                    c += 3 ' skip past interpolated region
+                Else
+                    c += 1
+                End If
+
+            End While
+
+        Next
+
+        Return DT
+    End Function
+
+
+
+    Public Function GaussianSmoothMAP(ByVal DT As DataTable,
+                                    Optional sigma As Double = 1.0,
+                                    Optional window As Integer = 3) As DataTable
+
+        ' precompute gaussian weights
+        Dim w(window * 2 + 1) As Double
+        Dim sumW As Double = 0
+        For i As Integer = -window To window
+            Dim g As Double = Math.Exp(-(i * i) / (2 * sigma * sigma))
+            w(i + window) = g
+            sumW += g
+        Next
+
+        Dim rows As Integer = DT.Rows.Count
+        Dim cols As Integer = dt.Columns.Count
+
+        ' output clone
+        Dim out = dt.Copy()
+
+        For c As Integer = 0 To cols - 1
+            For r As Integer = 0 To rows - 1
+
+                Dim v As Double = CDbl(dt.Rows(r)(c))
+                If v = 0 Then
+                    ' leave as is
+                    out.Rows(r)(c) = 0
+                    Continue For
+                End If
+
+                Dim acc As Double = 0
+                Dim wsum As Double = 0
+
+                For k As Integer = -window To window
+                    Dim rr As Integer = r + k
+                    If rr < 0 OrElse rr >= rows Then Continue For
+
+                    Dim vk As Double = CDbl(dt.Rows(rr)(c))
+                    If vk = 0 Then Continue For
+
+                    Dim wk As Double = w(k + window)
+                    acc += vk * wk
+                    wsum += wk
+                Next
+
+                If wsum > 0 Then
+                    out.Rows(r)(c) = acc / wsum
+                Else
+                    out.Rows(r)(c) = v
+                End If
+
+            Next
+        Next
+
+        ' copy back
+        For r As Integer = 0 To rows - 1
+            For c As Integer = 0 To cols - 1
+                dt.Rows(r)(c) = out.Rows(r)(c)
+            Next
+        Next
+
+        Return DT
+    End Function
+
+
+
 
 
 End Class

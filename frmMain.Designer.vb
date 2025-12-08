@@ -332,6 +332,7 @@ Partial Class frmMain
         Me.btnSplitOrientationTune = New System.Windows.Forms.Button()
         Me.Graph3D_Tune = New Graph3D.Plot3D.Graph3D()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.tsTarget = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuMain.SuspendLayout()
         Me.tabMain.SuspendLayout()
         Me.tabHisto.SuspendLayout()
@@ -3251,7 +3252,7 @@ Partial Class frmMain
         'tsTuneBtnViewVVENew
         '
         Me.tsTuneBtnViewVVENew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tsTuneBtnViewVVENew.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsTuneMnuViewVVENew, Me.tsTuneMnuViewError, Me.tsTuneMnuViewVVEOld})
+        Me.tsTuneBtnViewVVENew.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsTuneMnuViewVVENew, Me.tsTuneMnuViewError, Me.tsTuneMnuViewVVEOld, Me.tsTarget})
         Me.tsTuneBtnViewVVENew.Image = CType(resources.GetObject("tsTuneBtnViewVVENew.Image"), System.Drawing.Image)
         Me.tsTuneBtnViewVVENew.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.tsTuneBtnViewVVENew.ImageTransparentColor = System.Drawing.Color.Magenta
@@ -3265,20 +3266,20 @@ Partial Class frmMain
         Me.tsTuneMnuViewVVENew.CheckState = System.Windows.Forms.CheckState.Checked
         Me.tsTuneMnuViewVVENew.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
         Me.tsTuneMnuViewVVENew.Name = "tsTuneMnuViewVVENew"
-        Me.tsTuneMnuViewVVENew.Size = New System.Drawing.Size(151, 26)
+        Me.tsTuneMnuViewVVENew.Size = New System.Drawing.Size(180, 26)
         Me.tsTuneMnuViewVVENew.Text = "VVE New"
         '
         'tsTuneMnuViewError
         '
         Me.tsTuneMnuViewError.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsTuneMnuViewError.Name = "tsTuneMnuViewError"
-        Me.tsTuneMnuViewError.Size = New System.Drawing.Size(151, 26)
+        Me.tsTuneMnuViewError.Size = New System.Drawing.Size(180, 26)
         Me.tsTuneMnuViewError.Text = "Total Error"
         '
         'tsTuneMnuViewVVEOld
         '
         Me.tsTuneMnuViewVVEOld.Name = "tsTuneMnuViewVVEOld"
-        Me.tsTuneMnuViewVVEOld.Size = New System.Drawing.Size(151, 26)
+        Me.tsTuneMnuViewVVEOld.Size = New System.Drawing.Size(180, 26)
         Me.tsTuneMnuViewVVEOld.Text = "VVE Old"
         '
         'ToolStripSeparator16
@@ -3471,6 +3472,12 @@ Partial Class frmMain
         Me.Graph3D_Tune.Size = New System.Drawing.Size(581, 616)
         Me.Graph3D_Tune.TabIndex = 1
         Me.Graph3D_Tune.TopLegendColor = System.Drawing.Color.FromArgb(CType(CType(200, Byte), Integer), CType(CType(200, Byte), Integer), CType(CType(150, Byte), Integer))
+        '
+        'tsTarget
+        '
+        Me.tsTarget.Name = "tsTarget"
+        Me.tsTarget.Size = New System.Drawing.Size(180, 26)
+        Me.tsTarget.Text = "Target VVE"
         '
         'frmMain
         '
@@ -3849,4 +3856,5 @@ Partial Class frmMain
     Friend WithEvents spinBrushAgressiveness As NumericUpDown
     Friend WithEvents chkUseBrush As CheckBox
     Friend WithEvents Graph3D_VVE As Graph3D.Plot3D.Graph3D
+    Friend WithEvents tsTarget As ToolStripMenuItem
 End Class

@@ -902,13 +902,22 @@ Public Class clsLib
         Return Compute_Average_DT(DT_Histos)
     End Function
 
-    Public Shared Function PasteSpecialMultiplyPercent_Datatables(ByVal DT_VVE As DataTable, ByVal DT_ERR As DataTable) As DataTable
+    Public Shared Function PasteSpecialMultiplyPercent_Datatables(ByVal DT_VVE As DataTable,
+                                                                  ByVal DT_ERR As DataTable,
+                                                                  Optional ByVal FORCE_ZERO_IF_ERR_VALUE_DNE As Boolean = False) As DataTable
 
         'If Not Verify_DTs_Match(DT_VVE, DT_ERR, "") Then
         '    Throw New Exception("VVE and Histogram tables do not seem to match. Unable to compute.")
         'End If
 
         Dim DT_NEW As DataTable = DT_VVE.Copy
+        'If NULL_IF_ERR_VALUE_DNE Then
+        '    For i As Integer = 0 To DT_NEW.Columns.Count - 1
+        '        DT_NEW.Columns(i).AllowDBNull = True
+        '    Next
+        'End If
+
+
         Dim VVE As Object = 0.00
         Dim ERR As Object = 0.00
 
@@ -923,12 +932,43 @@ Public Class clsLib
                     ERR = CDec(ERR) / 100.0
                     VVE = VVE + (VVE * ERR)
                     DT_NEW.Rows(i).Item(j) = VVE
+                ElseIf FORCE_ZERO_IF_ERR_VALUE_DNE Then
+                    DT_NEW.Rows(i).Item(j) = 0 'DBNull.Value
                 End If
             Next
         Next
 
         Return DT_NEW
     End Function
+
+    'Public Shared Function Multiply_Datatables_Allow_Nulls(ByVal DT_VVE As DataTable, ByVal DT_ERR As DataTable) As DataTable
+
+    '    'If Not Verify_DTs_Match(DT_VVE, DT_ERR, "") Then
+    '    '    Throw New Exception("VVE and Histogram tables do not seem to match. Unable to compute.")
+    '    'End If
+
+    '    Dim DT_NEW As DataTable = DT_VVE.Copy
+    '    Dim VVE As Object = 0.00
+    '    Dim ERR As Object = 0.00
+
+
+    '    For i As Integer = 0 To DT_NEW.Rows.Count - 1
+    '        For j As Integer = 0 To DT_NEW.Columns.Count - 1
+
+    '            VVE = DT_NEW.Rows(i).Item(j)
+    '            ERR = DT_ERR.Rows(i).Item(j)
+
+    '            If IsNumeric(VVE) And IsNumeric(ERR) Then
+    '                ERR = CDec(ERR) / 100.0
+    '                VVE = VVE + (VVE * ERR)
+    '                DT_NEW.Rows(i).Item(j) = VVE
+    '            End If
+    '        Next
+    '    Next
+
+    '    Return DT_NEW
+    'End Function
+
 
     Public Shared Function SelectedCellsOnly_MultiplyByPercent(ByVal PCT As Decimal, ByVal GRD_SRC As DataGridView, ByVal DT_VVE_NEW As DataTable) As DataTable
         Dim VAL As Object = 0.0

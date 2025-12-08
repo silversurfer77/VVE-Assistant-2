@@ -914,10 +914,6 @@ Public Class frmMain
         ' -----------------
         ' VVE
         ' -----------------
-
-        Console.WriteLine("1) SelectionMode = " & grdVVE.SelectionMode.ToString)
-
-
         Dim obj3D_Old As New cls3D(Graph3D_VVE)
 
         obj3D_Old.Plot3D({{0, 0}, {0, 0}})
@@ -974,18 +970,19 @@ Public Class frmMain
         obj3D_New.Plot3D({{0, 0}, {0, 0}})
         Graph3D_Tune.Raster = Graph3D.Plot3D.Graph3D.eRaster.MainAxis
         Graph3D_Tune.AllowuserEdit = True
-        Graph3D_Tune.AxisX_Breakpoints = GetGridManager(grdVVE).ColumnHeaders
-        Graph3D_Tune.AxisY_Breakpoints = GetGridManager(grdVVE).RowHeaders_DBL
+        Graph3D_Tune.AxisX_Breakpoints = GetGridManager(grdHisto).ColumnHeaders
+        Graph3D_Tune.AxisY_Breakpoints = GetGridManager(grdHisto).RowHeaders_DBL
         Graph3D_Tune.AxisZ_TickInterval = 500
-        Graph3D_Tune.DrawAxisLabels = True
-        Graph3D_Tune.DrawAxisLines = True
+        Graph3D_Tune.DrawAxisLabels = False
+        Graph3D_Tune.DrawAxisLines = False
         Graph3D_Tune.RPMZoneBoundaries = Graph3D_VVE.RPMZoneBoundaries
         Graph3D_Tune.MAPZoneBoundaryMatrix = Graph3D_VVE.MAPZoneBoundaryMatrix
 
 
         '-------------------------------------------------------------------------------------------------------------------------
         ' might want to rethink this as it sets the datatable, etc, might be a performance bummer
-        Dim objDT_New As DataTable = DisplayVVE() 'DirectCast(grdTune.DataSource, DataTable)
+        'Dim objDT_New As DataTable = DisplayVVE() 'DirectCast(grdTune.DataSource, DataTable)
+        Dim objDT_New As DataTable = GetGridManager(grdTune).DataSource
         '--------------------------------------------------------------------------------------------------------------------
 
         Console.WriteLine("SelectionMode = " & grdVVE.SelectionMode.ToString)
@@ -1462,7 +1459,11 @@ Public Class frmMain
         End Try
     End Sub
 
-    Private Sub tsTuneMnuViewVVENew_Click(sender As Object, e As EventArgs) Handles tsTuneBtnViewVVENew.ButtonClick, tsTuneMnuViewError.Click, tsTuneMnuViewVVENew.Click, tsTuneMnuViewVVEOld.Click
+    Private Sub tsTuneMnuViewVVENew_Click(sender As Object, e As EventArgs) Handles tsTuneBtnViewVVENew.ButtonClick,
+                                                                                    tsTuneMnuViewError.Click,
+                                                                                    tsTuneMnuViewVVENew.Click,
+                                                                                    tsTuneMnuViewVVEOld.Click,
+                                                                                    tsTarget.Click
 
         'Dim COL_SCROLL As Integer = 0
         'Dim ROW_SCROLL As Integer = 0
@@ -1491,6 +1492,7 @@ Public Class frmMain
                 tsTuneMnuViewError.Checked = True
                 tsTuneMnuViewVVENew.Checked = False
                 tsTuneMnuViewVVEOld.Checked = False
+                tsTarget.Checked = False
 
                 DisplayPasteSpecial()
 
@@ -1498,6 +1500,7 @@ Public Class frmMain
                 tsTuneMnuViewError.Checked = False
                 tsTuneMnuViewVVENew.Checked = True
                 tsTuneMnuViewVVEOld.Checked = False
+                tsTarget.Checked = False
 
                 DisplayVVE()
 
@@ -1505,8 +1508,18 @@ Public Class frmMain
                 tsTuneMnuViewError.Checked = False
                 tsTuneMnuViewVVENew.Checked = False
                 tsTuneMnuViewVVEOld.Checked = True
+                tsTarget.Checked = False
 
                 DisplayVVE()
+
+            ElseIf sender.Equals(tsTarget) Then
+                tsTuneMnuViewError.Checked = False
+                tsTuneMnuViewVVENew.Checked = False
+                tsTuneMnuViewVVEOld.Checked = False
+                tsTarget.Checked = True
+
+
+                CreateTagetVVEWithNulls()
 
             End If
 
@@ -1664,7 +1677,11 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub CalcPasteSpecial(ByVal DT_HISTO As DataTable, ByVal DT_VVE_OLD As DataTable, ByVal DT_VVE_NEW As DataTable, ByRef DT_PASTE_SPECIAL As DataTable, ByVal RESULT_AS_PERCENT As Boolean)
+    Private Sub CalcPasteSpecial(ByVal DT_HISTO As DataTable,
+                                 ByVal DT_VVE_OLD As DataTable,
+                                 ByVal DT_VVE_NEW As DataTable,
+                                 ByRef DT_PASTE_SPECIAL As DataTable,
+                                 ByVal RESULT_AS_PERCENT As Boolean)
 
         If Not DTs_HAVE_DATA({DT_HISTO, DT_VVE_OLD, DT_VVE_NEW}) Then
             Exit Sub
@@ -1730,6 +1747,63 @@ Public Class frmMain
 
 
     End Sub
+
+
+    Private Function CreateTagetVVEWithNulls() As DataTable
+        ' this is needed to create the VVE target (raw VVE values, not with percents)
+        ' there will be nulls and we will interpolate those gaps
+        ' we will also raise/lower the edges of the data to match.
+        ' the problem is that we cannot count on the histo breakpoints
+        ' to match the raw VVE breakpoints from teh scanner, so first
+        ' we have to use the coefficients to re-create the VVE table...
+
+
+
+        If Not DTs_HAVE_DATA({GetGridManager(grdHisto).DataSource, GetGridManager(grdVVE).DataSource}) Then
+            Return New DataTable
+        End If
+
+        Dim MATH As New clsMath(SMALL_ZONE_WARN)
+        Dim DT_VVE_ADJUSTED_BREAKPOINTS As DataTable = MATH.CreateVVEFromCoeffAndBreakpoints(GetGridManager(grdVVEConst).DataSource,
+                                                                                             GetGridManager(grdVVEMAP).DataSource,
+                                                                                             GetGridManager(grdVVEMAP2).DataSource,
+                                                                                             GetGridManager(grdVVERPM).DataSource,
+                                                                                             GetGridManager(grdVVERPM2).DataSource,
+                                                                                             GetGridManager(grdVVEMAPRPM).DataSource,
+                                                                                             GetGridManager(grdZoneRPM).DataSource,
+                                                                                             GetGridManager(grdZoneMAP).DataSource,
+                                                                                             GetGridManager(grdHisto).RowHeaders_STR,
+                                                                                             GetGridManager(grdHisto).ColumnHeaders_STR,
+                                                                                             GetGridManager(grdVVE).DataSource,
+                                                                                             mnuOptionsVerlonModeSDPatch.Checked)
+
+        Dim DT_TARGET_WITH_NULL As DataTable = clsLib.PasteSpecialMultiplyPercent_Datatables(DT_VVE_ADJUSTED_BREAKPOINTS,
+                                                                                             GetGridManager(grdHisto).DataSource,
+                                                                                             True)
+
+
+
+
+
+        ' Interpolate MAP values as much as possible
+        Dim DT_TARGET_WITH_INTERPOLATION As DataTable = MATH.InterpolateInteriorMAP(DT_TARGET_WITH_NULL)
+
+        ' Interpolate one and only one RPM gap
+        DT_TARGET_WITH_INTERPOLATION = MATH.InterpolateOneRPMValue(DT_TARGET_WITH_INTERPOLATION)
+
+        ' Smooth with the grain
+        DT_TARGET_WITH_INTERPOLATION = MATH.GaussianSmoothMAP(DT_TARGET_WITH_INTERPOLATION)
+
+
+        Dim GRD_MGR As clsGridManager = GetGridManager(grdTune)
+        GRD_MGR.DecimalPlaces = 0
+        GRD_MGR.SetDatatable(DT_TARGET_WITH_INTERPOLATION, GetGridManager(grdTune).RowHeaders_STR)
+
+        Return DT_TARGET_WITH_INTERPOLATION
+
+    End Function
+
+
 
     Private Function GetExpectedValue(ByVal OLD_VAL As Double, ByVal DT_HISTO As DataTable, ByVal ROW As Integer, ByVal COL As Integer) As Double
         If ROW > DT_HISTO.Rows.Count - 1 Then
