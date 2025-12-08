@@ -154,14 +154,14 @@ Public Class clsGridManager
         ResizeColumns()
 
 
-        With _GRD
-            .MultiSelect = True
-            .ReadOnly = False           ' required for CellSelect
-            .EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2
-            .SelectionMode = DataGridViewSelectionMode.CellSelect
-        End With
+        'With _GRD
+        '    .MultiSelect = True
+        '    .ReadOnly = False           ' required for CellSelect
+        '    .EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2
+        '    .SelectionMode = DataGridViewSelectionMode.CellSelect
+        'End With
 
-        Debug.WriteLine("SelectionMode = " & _GRD.SelectionMode.ToString())
+        'Debug.WriteLine("SelectionMode = " & _GRD.SelectionMode.ToString())
 
         'redraw
         '_GRD.Invalidate()

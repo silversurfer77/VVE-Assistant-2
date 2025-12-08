@@ -22,3 +22,4 @@ C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assistant 2.exe
 C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assistant 2.xml
 C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assistant 2.pdb
 C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE Assistant 2.exe.config
+C:\Users\danku\source\repos\VVE Assistant 2\obj\Debug\VVE_Assistant_2.frmAutotune.resources

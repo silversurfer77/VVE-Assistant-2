@@ -132,7 +132,6 @@ Partial Class frmMain
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
         Me.tsVVEBtnClear = New System.Windows.Forms.ToolStripButton()
         Me.btnSplitOrientationVVE = New System.Windows.Forms.Button()
-        Me.Graph3D_VVE = New Graph3D.Plot3D.Graph3D()
         Me.tabVVECoeff = New System.Windows.Forms.TabPage()
         Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
         Me.tsVVERPM2 = New System.Windows.Forms.ToolStrip()
@@ -315,6 +314,7 @@ Partial Class frmMain
         Me.tsTuneMnuViewVVENew = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsTuneMnuViewError = New System.Windows.Forms.ToolStripMenuItem()
         Me.tsTuneMnuViewVVEOld = New System.Windows.Forms.ToolStripMenuItem()
+        Me.tsAutotune = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator16 = New System.Windows.Forms.ToolStripSeparator()
         Me.tsTuneBtnInterpolateVertical = New System.Windows.Forms.ToolStripButton()
         Me.tsTuneBtnInterpolateHorizontal = New System.Windows.Forms.ToolStripButton()
@@ -330,9 +330,9 @@ Partial Class frmMain
         Me.splitTune = New System.Windows.Forms.SplitContainer()
         Me.grdTune = New System.Windows.Forms.DataGridView()
         Me.btnSplitOrientationTune = New System.Windows.Forms.Button()
-        Me.Graph3D_Tune = New Graph3D.Plot3D.Graph3D()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.tsTarget = New System.Windows.Forms.ToolStripMenuItem()
+        Me.Graph3D_VVE = New Graph3D.Plot3D.Graph3D()
+        Me.Graph3D_Tune = New Graph3D.Plot3D.Graph3D()
         Me.mnuMain.SuspendLayout()
         Me.tabMain.SuspendLayout()
         Me.tabHisto.SuspendLayout()
@@ -705,7 +705,7 @@ Partial Class frmMain
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(1170, 666)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(1170, 673)
         Me.TableLayoutPanel1.TabIndex = 36
         '
         'tsZoneRPM
@@ -792,7 +792,7 @@ Partial Class frmMain
         Me.grdZoneMAP.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.grdZoneMAP.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grdZoneMAP.EnableHeadersVisualStyles = False
-        Me.grdZoneMAP.Location = New System.Drawing.Point(4, 418)
+        Me.grdZoneMAP.Location = New System.Drawing.Point(4, 421)
         Me.grdZoneMAP.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grdZoneMAP.Name = "grdZoneMAP"
         DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -806,14 +806,14 @@ Partial Class frmMain
         Me.grdZoneMAP.RowHeadersDefaultCellStyle = DataGridViewCellStyle4
         Me.grdZoneMAP.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdZoneMAP.ShowEditingIcon = False
-        Me.grdZoneMAP.Size = New System.Drawing.Size(1162, 243)
+        Me.grdZoneMAP.Size = New System.Drawing.Size(1162, 247)
         Me.grdZoneMAP.TabIndex = 33
         '
         'Label1
         '
         Me.Label1.AutoSize = True
         Me.Label1.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Label1.Location = New System.Drawing.Point(3, 343)
+        Me.Label1.Location = New System.Drawing.Point(3, 346)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(1164, 20)
         Me.Label1.TabIndex = 35
@@ -852,7 +852,7 @@ Partial Class frmMain
         Me.grdZoneRPM.RowHeadersDefaultCellStyle = DataGridViewCellStyle6
         Me.grdZoneRPM.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdZoneRPM.ShowEditingIcon = False
-        Me.grdZoneRPM.Size = New System.Drawing.Size(1162, 243)
+        Me.grdZoneRPM.Size = New System.Drawing.Size(1162, 246)
         Me.grdZoneRPM.TabIndex = 10
         '
         'Label9
@@ -870,7 +870,7 @@ Partial Class frmMain
         Me.tsZoneMAP.AutoSize = False
         Me.tsZoneMAP.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsZoneMAP.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsZoneMAPBtnPaste, Me.tsZoneMAPBtnCopy, Me.ToolStripSeparator5, Me.tsZoneMAPBtnClear})
-        Me.tsZoneMAP.Location = New System.Drawing.Point(0, 363)
+        Me.tsZoneMAP.Location = New System.Drawing.Point(0, 366)
         Me.tsZoneMAP.Name = "tsZoneMAP"
         Me.tsZoneMAP.Size = New System.Drawing.Size(1170, 50)
         Me.tsZoneMAP.TabIndex = 37
@@ -1126,33 +1126,6 @@ Partial Class frmMain
         Me.btnSplitOrientationVVE.TabIndex = 42
         Me.btnSplitOrientationVVE.UseVisualStyleBackColor = True
         '
-        'Graph3D_VVE
-        '
-        Me.Graph3D_VVE.AllowuserEdit = False
-        Me.Graph3D_VVE.AxisX_Breakpoints = Nothing
-        Me.Graph3D_VVE.AxisX_Color = System.Drawing.Color.DarkBlue
-        Me.Graph3D_VVE.AxisX_Legend = Nothing
-        Me.Graph3D_VVE.AxisY_Breakpoints = Nothing
-        Me.Graph3D_VVE.AxisY_Color = System.Drawing.Color.DarkGreen
-        Me.Graph3D_VVE.AxisY_Legend = Nothing
-        Me.Graph3D_VVE.AxisZ_Color = System.Drawing.Color.DarkRed
-        Me.Graph3D_VVE.AxisZ_Legend = Nothing
-        Me.Graph3D_VVE.AxisZ_TickInterval = 500
-        Me.Graph3D_VVE.BackColor = System.Drawing.Color.White
-        Me.Graph3D_VVE.BorderColor = System.Drawing.Color.FromArgb(CType(CType(180, Byte), Integer), CType(CType(180, Byte), Integer), CType(CType(180, Byte), Integer))
-        Me.Graph3D_VVE.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Graph3D_VVE.DrawAxisLabels = True
-        Me.Graph3D_VVE.DrawAxisLines = True
-        Me.Graph3D_VVE.Location = New System.Drawing.Point(0, 0)
-        Me.Graph3D_VVE.MAPZoneBoundaryMatrix = Nothing
-        Me.Graph3D_VVE.Name = "Graph3D_VVE"
-        Me.Graph3D_VVE.PolygonLineColor = System.Drawing.Color.Black
-        Me.Graph3D_VVE.Raster = Graph3D.Plot3D.Graph3D.eRaster.Off
-        Me.Graph3D_VVE.RPMZoneBoundaries = Nothing
-        Me.Graph3D_VVE.Size = New System.Drawing.Size(372, 672)
-        Me.Graph3D_VVE.TabIndex = 18
-        Me.Graph3D_VVE.TopLegendColor = System.Drawing.Color.White
-        '
         'tabVVECoeff
         '
         Me.tabVVECoeff.Controls.Add(Me.TableLayoutPanel2)
@@ -1201,7 +1174,7 @@ Partial Class frmMain
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50.0!))
         Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-        Me.TableLayoutPanel2.Size = New System.Drawing.Size(1176, 672)
+        Me.TableLayoutPanel2.Size = New System.Drawing.Size(1176, 679)
         Me.TableLayoutPanel2.TabIndex = 38
         '
         'tsVVERPM2
@@ -1209,7 +1182,7 @@ Partial Class frmMain
         Me.tsVVERPM2.AutoSize = False
         Me.tsVVERPM2.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsVVERPM2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsVVERPM2BtnPaste, Me.tsVVERPM2BtnCopy, Me.ToolStripSeparator6, Me.tsVVERPM2BtnClear})
-        Me.tsVVERPM2.Location = New System.Drawing.Point(588, 480)
+        Me.tsVVERPM2.Location = New System.Drawing.Point(588, 486)
         Me.tsVVERPM2.Name = "tsVVERPM2"
         Me.tsVVERPM2.Size = New System.Drawing.Size(588, 50)
         Me.tsVVERPM2.TabIndex = 39
@@ -1478,7 +1451,7 @@ Partial Class frmMain
         Me.grdVVEConst.RowHeadersDefaultCellStyle = DataGridViewCellStyle10
         Me.grdVVEConst.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEConst.ShowEditingIcon = False
-        Me.grdVVEConst.Size = New System.Drawing.Size(580, 130)
+        Me.grdVVEConst.Size = New System.Drawing.Size(580, 133)
         Me.grdVVEConst.TabIndex = 39
         '
         'Label2
@@ -1495,7 +1468,7 @@ Partial Class frmMain
         '
         Me.Label14.AutoSize = True
         Me.Label14.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Label14.Location = New System.Drawing.Point(591, 460)
+        Me.Label14.Location = New System.Drawing.Point(591, 466)
         Me.Label14.Name = "Label14"
         Me.Label14.Size = New System.Drawing.Size(582, 20)
         Me.Label14.TabIndex = 37
@@ -1505,7 +1478,7 @@ Partial Class frmMain
         '
         Me.Label12.AutoSize = True
         Me.Label12.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Label12.Location = New System.Drawing.Point(591, 230)
+        Me.Label12.Location = New System.Drawing.Point(591, 233)
         Me.Label12.Name = "Label12"
         Me.Label12.Size = New System.Drawing.Size(582, 20)
         Me.Label12.TabIndex = 35
@@ -1525,7 +1498,7 @@ Partial Class frmMain
         '
         Me.Label11.AutoSize = True
         Me.Label11.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Label11.Location = New System.Drawing.Point(3, 230)
+        Me.Label11.Location = New System.Drawing.Point(3, 233)
         Me.Label11.Name = "Label11"
         Me.Label11.Size = New System.Drawing.Size(582, 20)
         Me.Label11.TabIndex = 34
@@ -1550,7 +1523,7 @@ Partial Class frmMain
         Me.grdVVEMAP.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.grdVVEMAP.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grdVVEMAP.EnableHeadersVisualStyles = False
-        Me.grdVVEMAP.Location = New System.Drawing.Point(4, 305)
+        Me.grdVVEMAP.Location = New System.Drawing.Point(4, 308)
         Me.grdVVEMAP.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grdVVEMAP.Name = "grdVVEMAP"
         DataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -1564,7 +1537,7 @@ Partial Class frmMain
         Me.grdVVEMAP.RowHeadersDefaultCellStyle = DataGridViewCellStyle12
         Me.grdVVEMAP.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEMAP.ShowEditingIcon = False
-        Me.grdVVEMAP.Size = New System.Drawing.Size(580, 130)
+        Me.grdVVEMAP.Size = New System.Drawing.Size(580, 133)
         Me.grdVVEMAP.TabIndex = 40
         '
         'grdVVEMAP2
@@ -1586,7 +1559,7 @@ Partial Class frmMain
         Me.grdVVEMAP2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.grdVVEMAP2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grdVVEMAP2.EnableHeadersVisualStyles = False
-        Me.grdVVEMAP2.Location = New System.Drawing.Point(4, 535)
+        Me.grdVVEMAP2.Location = New System.Drawing.Point(4, 541)
         Me.grdVVEMAP2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grdVVEMAP2.Name = "grdVVEMAP2"
         DataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -1600,7 +1573,7 @@ Partial Class frmMain
         Me.grdVVEMAP2.RowHeadersDefaultCellStyle = DataGridViewCellStyle14
         Me.grdVVEMAP2.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEMAP2.ShowEditingIcon = False
-        Me.grdVVEMAP2.Size = New System.Drawing.Size(580, 132)
+        Me.grdVVEMAP2.Size = New System.Drawing.Size(580, 133)
         Me.grdVVEMAP2.TabIndex = 41
         '
         'grdVVEMAPRPM
@@ -1636,7 +1609,7 @@ Partial Class frmMain
         Me.grdVVEMAPRPM.RowHeadersDefaultCellStyle = DataGridViewCellStyle16
         Me.grdVVEMAPRPM.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEMAPRPM.ShowEditingIcon = False
-        Me.grdVVEMAPRPM.Size = New System.Drawing.Size(580, 130)
+        Me.grdVVEMAPRPM.Size = New System.Drawing.Size(580, 133)
         Me.grdVVEMAPRPM.TabIndex = 42
         '
         'grdVVERPM
@@ -1658,7 +1631,7 @@ Partial Class frmMain
         Me.grdVVERPM.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.grdVVERPM.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grdVVERPM.EnableHeadersVisualStyles = False
-        Me.grdVVERPM.Location = New System.Drawing.Point(592, 305)
+        Me.grdVVERPM.Location = New System.Drawing.Point(592, 308)
         Me.grdVVERPM.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grdVVERPM.Name = "grdVVERPM"
         DataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -1672,7 +1645,7 @@ Partial Class frmMain
         Me.grdVVERPM.RowHeadersDefaultCellStyle = DataGridViewCellStyle18
         Me.grdVVERPM.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVERPM.ShowEditingIcon = False
-        Me.grdVVERPM.Size = New System.Drawing.Size(580, 130)
+        Me.grdVVERPM.Size = New System.Drawing.Size(580, 133)
         Me.grdVVERPM.TabIndex = 43
         '
         'grdVVERPM2
@@ -1694,7 +1667,7 @@ Partial Class frmMain
         Me.grdVVERPM2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.grdVVERPM2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grdVVERPM2.EnableHeadersVisualStyles = False
-        Me.grdVVERPM2.Location = New System.Drawing.Point(592, 535)
+        Me.grdVVERPM2.Location = New System.Drawing.Point(592, 541)
         Me.grdVVERPM2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grdVVERPM2.Name = "grdVVERPM2"
         DataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -1708,7 +1681,7 @@ Partial Class frmMain
         Me.grdVVERPM2.RowHeadersDefaultCellStyle = DataGridViewCellStyle20
         Me.grdVVERPM2.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVERPM2.ShowEditingIcon = False
-        Me.grdVVERPM2.Size = New System.Drawing.Size(580, 132)
+        Me.grdVVERPM2.Size = New System.Drawing.Size(580, 133)
         Me.grdVVERPM2.TabIndex = 44
         '
         'tsVVEMAP
@@ -1716,7 +1689,7 @@ Partial Class frmMain
         Me.tsVVEMAP.AutoSize = False
         Me.tsVVEMAP.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsVVEMAP.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsVVEMAPBtnPaste, Me.tsVVEMAPBtnCopy, Me.ToolStripSeparator8, Me.tsVVEMAPBtnClear})
-        Me.tsVVEMAP.Location = New System.Drawing.Point(0, 250)
+        Me.tsVVEMAP.Location = New System.Drawing.Point(0, 253)
         Me.tsVVEMAP.Name = "tsVVEMAP"
         Me.tsVVEMAP.Size = New System.Drawing.Size(588, 50)
         Me.tsVVEMAP.TabIndex = 45
@@ -1796,7 +1769,7 @@ Partial Class frmMain
         Me.tsVVEMAP2.AutoSize = False
         Me.tsVVEMAP2.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsVVEMAP2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsVVEMAP2BtnPaste, Me.tsVVEMAP2BtnCopy, Me.ToolStripSeparator9, Me.tsVVEMAP2BtnClear})
-        Me.tsVVEMAP2.Location = New System.Drawing.Point(0, 480)
+        Me.tsVVEMAP2.Location = New System.Drawing.Point(0, 486)
         Me.tsVVEMAP2.Name = "tsVVEMAP2"
         Me.tsVVEMAP2.Size = New System.Drawing.Size(588, 50)
         Me.tsVVEMAP2.TabIndex = 46
@@ -1875,7 +1848,7 @@ Partial Class frmMain
         '
         Me.Label13.AutoSize = True
         Me.Label13.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Label13.Location = New System.Drawing.Point(3, 460)
+        Me.Label13.Location = New System.Drawing.Point(3, 466)
         Me.Label13.Name = "Label13"
         Me.Label13.Size = New System.Drawing.Size(582, 20)
         Me.Label13.TabIndex = 36
@@ -1886,7 +1859,7 @@ Partial Class frmMain
         Me.tsVVERPM.AutoSize = False
         Me.tsVVERPM.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsVVERPM.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsVVERPMBtnPaste, Me.tsVVERPMBtnCopy, Me.ToolStripSeparator11, Me.tsVVERPMBtnClear})
-        Me.tsVVERPM.Location = New System.Drawing.Point(588, 250)
+        Me.tsVVERPM.Location = New System.Drawing.Point(588, 253)
         Me.tsVVERPM.Name = "tsVVERPM"
         Me.tsVVERPM.Size = New System.Drawing.Size(588, 50)
         Me.tsVVERPM.TabIndex = 48
@@ -2003,7 +1976,7 @@ Partial Class frmMain
         Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
         Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
         Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-        Me.TableLayoutPanel3.Size = New System.Drawing.Size(1176, 672)
+        Me.TableLayoutPanel3.Size = New System.Drawing.Size(1176, 679)
         Me.TableLayoutPanel3.TabIndex = 39
         '
         'tsVVEIntakeCam
@@ -2214,7 +2187,7 @@ Partial Class frmMain
         Me.grdVVEIntakeMAP.RowHeadersDefaultCellStyle = DataGridViewCellStyle22
         Me.grdVVEIntakeMAP.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEIntakeMAP.ShowEditingIcon = False
-        Me.grdVVEIntakeMAP.Size = New System.Drawing.Size(580, 246)
+        Me.grdVVEIntakeMAP.Size = New System.Drawing.Size(580, 249)
         Me.grdVVEIntakeMAP.TabIndex = 39
         '
         'Label3
@@ -2231,7 +2204,7 @@ Partial Class frmMain
         '
         Me.Label5.AutoSize = True
         Me.Label5.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Label5.Location = New System.Drawing.Point(591, 346)
+        Me.Label5.Location = New System.Drawing.Point(591, 349)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(582, 20)
         Me.Label5.TabIndex = 35
@@ -2251,7 +2224,7 @@ Partial Class frmMain
         '
         Me.Label7.AutoSize = True
         Me.Label7.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Label7.Location = New System.Drawing.Point(3, 346)
+        Me.Label7.Location = New System.Drawing.Point(3, 349)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(582, 20)
         Me.Label7.TabIndex = 34
@@ -2276,7 +2249,7 @@ Partial Class frmMain
         Me.grdVVEIntakeRPM.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.grdVVEIntakeRPM.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grdVVEIntakeRPM.EnableHeadersVisualStyles = False
-        Me.grdVVEIntakeRPM.Location = New System.Drawing.Point(4, 421)
+        Me.grdVVEIntakeRPM.Location = New System.Drawing.Point(4, 424)
         Me.grdVVEIntakeRPM.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grdVVEIntakeRPM.Name = "grdVVEIntakeRPM"
         DataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -2290,7 +2263,7 @@ Partial Class frmMain
         Me.grdVVEIntakeRPM.RowHeadersDefaultCellStyle = DataGridViewCellStyle24
         Me.grdVVEIntakeRPM.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEIntakeRPM.ShowEditingIcon = False
-        Me.grdVVEIntakeRPM.Size = New System.Drawing.Size(580, 246)
+        Me.grdVVEIntakeRPM.Size = New System.Drawing.Size(580, 250)
         Me.grdVVEIntakeRPM.TabIndex = 40
         '
         'grdVVEIntakeCam
@@ -2326,7 +2299,7 @@ Partial Class frmMain
         Me.grdVVEIntakeCam.RowHeadersDefaultCellStyle = DataGridViewCellStyle26
         Me.grdVVEIntakeCam.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEIntakeCam.ShowEditingIcon = False
-        Me.grdVVEIntakeCam.Size = New System.Drawing.Size(580, 246)
+        Me.grdVVEIntakeCam.Size = New System.Drawing.Size(580, 249)
         Me.grdVVEIntakeCam.TabIndex = 42
         '
         'grdVVEIntakeCam2
@@ -2348,7 +2321,7 @@ Partial Class frmMain
         Me.grdVVEIntakeCam2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.grdVVEIntakeCam2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grdVVEIntakeCam2.EnableHeadersVisualStyles = False
-        Me.grdVVEIntakeCam2.Location = New System.Drawing.Point(592, 421)
+        Me.grdVVEIntakeCam2.Location = New System.Drawing.Point(592, 424)
         Me.grdVVEIntakeCam2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grdVVEIntakeCam2.Name = "grdVVEIntakeCam2"
         DataGridViewCellStyle28.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -2362,7 +2335,7 @@ Partial Class frmMain
         Me.grdVVEIntakeCam2.RowHeadersDefaultCellStyle = DataGridViewCellStyle28
         Me.grdVVEIntakeCam2.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEIntakeCam2.ShowEditingIcon = False
-        Me.grdVVEIntakeCam2.Size = New System.Drawing.Size(580, 246)
+        Me.grdVVEIntakeCam2.Size = New System.Drawing.Size(580, 250)
         Me.grdVVEIntakeCam2.TabIndex = 43
         '
         'tsVVEIntakeRPM
@@ -2370,7 +2343,7 @@ Partial Class frmMain
         Me.tsVVEIntakeRPM.AutoSize = False
         Me.tsVVEIntakeRPM.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsVVEIntakeRPM.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsVVEIntakeRPMBtnPaste, Me.tsVVEIntakeRPMBtnCopy, Me.ToolStripSeparator15, Me.tsVVEIntakeRPMBtnClear})
-        Me.tsVVEIntakeRPM.Location = New System.Drawing.Point(0, 366)
+        Me.tsVVEIntakeRPM.Location = New System.Drawing.Point(0, 369)
         Me.tsVVEIntakeRPM.Name = "tsVVEIntakeRPM"
         Me.tsVVEIntakeRPM.Size = New System.Drawing.Size(588, 50)
         Me.tsVVEIntakeRPM.TabIndex = 45
@@ -2450,7 +2423,7 @@ Partial Class frmMain
         Me.tsVVEIntakeCam2.AutoSize = False
         Me.tsVVEIntakeCam2.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsVVEIntakeCam2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsVVEIntakeCam2BtnPaste, Me.tsVVEIntakeCam2BtnCopy, Me.ToolStripSeparator17, Me.tsVVEIntakeCam2BtnClear})
-        Me.tsVVEIntakeCam2.Location = New System.Drawing.Point(588, 366)
+        Me.tsVVEIntakeCam2.Location = New System.Drawing.Point(588, 369)
         Me.tsVVEIntakeCam2.Name = "tsVVEIntakeCam2"
         Me.tsVVEIntakeCam2.Size = New System.Drawing.Size(588, 50)
         Me.tsVVEIntakeCam2.TabIndex = 48
@@ -2567,7 +2540,7 @@ Partial Class frmMain
         Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
         Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50.0!))
         Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-        Me.TableLayoutPanel4.Size = New System.Drawing.Size(1176, 672)
+        Me.TableLayoutPanel4.Size = New System.Drawing.Size(1176, 679)
         Me.TableLayoutPanel4.TabIndex = 39
         '
         'tsVVEExhaustCam
@@ -2778,7 +2751,7 @@ Partial Class frmMain
         Me.grdVVEExhaustMAP.RowHeadersDefaultCellStyle = DataGridViewCellStyle30
         Me.grdVVEExhaustMAP.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEExhaustMAP.ShowEditingIcon = False
-        Me.grdVVEExhaustMAP.Size = New System.Drawing.Size(580, 130)
+        Me.grdVVEExhaustMAP.Size = New System.Drawing.Size(580, 133)
         Me.grdVVEExhaustMAP.TabIndex = 39
         '
         'Label15
@@ -2795,7 +2768,7 @@ Partial Class frmMain
         '
         Me.Label17.AutoSize = True
         Me.Label17.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Label17.Location = New System.Drawing.Point(591, 230)
+        Me.Label17.Location = New System.Drawing.Point(591, 233)
         Me.Label17.Name = "Label17"
         Me.Label17.Size = New System.Drawing.Size(582, 20)
         Me.Label17.TabIndex = 35
@@ -2815,7 +2788,7 @@ Partial Class frmMain
         '
         Me.Label19.AutoSize = True
         Me.Label19.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Label19.Location = New System.Drawing.Point(3, 230)
+        Me.Label19.Location = New System.Drawing.Point(3, 233)
         Me.Label19.Name = "Label19"
         Me.Label19.Size = New System.Drawing.Size(582, 20)
         Me.Label19.TabIndex = 34
@@ -2840,7 +2813,7 @@ Partial Class frmMain
         Me.grdVVEExhaustRPM.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.grdVVEExhaustRPM.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grdVVEExhaustRPM.EnableHeadersVisualStyles = False
-        Me.grdVVEExhaustRPM.Location = New System.Drawing.Point(4, 305)
+        Me.grdVVEExhaustRPM.Location = New System.Drawing.Point(4, 308)
         Me.grdVVEExhaustRPM.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grdVVEExhaustRPM.Name = "grdVVEExhaustRPM"
         DataGridViewCellStyle32.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -2854,7 +2827,7 @@ Partial Class frmMain
         Me.grdVVEExhaustRPM.RowHeadersDefaultCellStyle = DataGridViewCellStyle32
         Me.grdVVEExhaustRPM.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEExhaustRPM.ShowEditingIcon = False
-        Me.grdVVEExhaustRPM.Size = New System.Drawing.Size(580, 130)
+        Me.grdVVEExhaustRPM.Size = New System.Drawing.Size(580, 133)
         Me.grdVVEExhaustRPM.TabIndex = 40
         '
         'grdVVEExhaustExIn
@@ -2876,7 +2849,7 @@ Partial Class frmMain
         Me.grdVVEExhaustExIn.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.grdVVEExhaustExIn.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grdVVEExhaustExIn.EnableHeadersVisualStyles = False
-        Me.grdVVEExhaustExIn.Location = New System.Drawing.Point(4, 535)
+        Me.grdVVEExhaustExIn.Location = New System.Drawing.Point(4, 541)
         Me.grdVVEExhaustExIn.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grdVVEExhaustExIn.Name = "grdVVEExhaustExIn"
         DataGridViewCellStyle34.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -2890,7 +2863,7 @@ Partial Class frmMain
         Me.grdVVEExhaustExIn.RowHeadersDefaultCellStyle = DataGridViewCellStyle34
         Me.grdVVEExhaustExIn.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEExhaustExIn.ShowEditingIcon = False
-        Me.grdVVEExhaustExIn.Size = New System.Drawing.Size(580, 132)
+        Me.grdVVEExhaustExIn.Size = New System.Drawing.Size(580, 133)
         Me.grdVVEExhaustExIn.TabIndex = 41
         '
         'grdVVEExhaustCam
@@ -2926,7 +2899,7 @@ Partial Class frmMain
         Me.grdVVEExhaustCam.RowHeadersDefaultCellStyle = DataGridViewCellStyle36
         Me.grdVVEExhaustCam.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEExhaustCam.ShowEditingIcon = False
-        Me.grdVVEExhaustCam.Size = New System.Drawing.Size(580, 130)
+        Me.grdVVEExhaustCam.Size = New System.Drawing.Size(580, 133)
         Me.grdVVEExhaustCam.TabIndex = 42
         '
         'grdVVEExhaustCam2
@@ -2948,7 +2921,7 @@ Partial Class frmMain
         Me.grdVVEExhaustCam2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.grdVVEExhaustCam2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grdVVEExhaustCam2.EnableHeadersVisualStyles = False
-        Me.grdVVEExhaustCam2.Location = New System.Drawing.Point(592, 305)
+        Me.grdVVEExhaustCam2.Location = New System.Drawing.Point(592, 308)
         Me.grdVVEExhaustCam2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.grdVVEExhaustCam2.Name = "grdVVEExhaustCam2"
         DataGridViewCellStyle38.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -2962,7 +2935,7 @@ Partial Class frmMain
         Me.grdVVEExhaustCam2.RowHeadersDefaultCellStyle = DataGridViewCellStyle38
         Me.grdVVEExhaustCam2.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders
         Me.grdVVEExhaustCam2.ShowEditingIcon = False
-        Me.grdVVEExhaustCam2.Size = New System.Drawing.Size(580, 130)
+        Me.grdVVEExhaustCam2.Size = New System.Drawing.Size(580, 133)
         Me.grdVVEExhaustCam2.TabIndex = 43
         '
         'tsVVEExhaustRPM
@@ -2970,7 +2943,7 @@ Partial Class frmMain
         Me.tsVVEExhaustRPM.AutoSize = False
         Me.tsVVEExhaustRPM.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsVVEExhaustRPM.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsVVEExhaustRPMBtnPaste, Me.tsVVEExhaustRPMBtnCopy, Me.ToolStripSeparator21, Me.tsVVEExhaustRPMBtnClear})
-        Me.tsVVEExhaustRPM.Location = New System.Drawing.Point(0, 250)
+        Me.tsVVEExhaustRPM.Location = New System.Drawing.Point(0, 253)
         Me.tsVVEExhaustRPM.Name = "tsVVEExhaustRPM"
         Me.tsVVEExhaustRPM.Size = New System.Drawing.Size(588, 50)
         Me.tsVVEExhaustRPM.TabIndex = 45
@@ -3050,7 +3023,7 @@ Partial Class frmMain
         Me.tsVVEExhaustExIn.AutoSize = False
         Me.tsVVEExhaustExIn.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsVVEExhaustExIn.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsVVEExhaustExInBtnPaste, Me.tsVVEExhaustExInBtnCopy, Me.ToolStripSeparator22, Me.tsVVEExhaustExInBtnClear})
-        Me.tsVVEExhaustExIn.Location = New System.Drawing.Point(0, 480)
+        Me.tsVVEExhaustExIn.Location = New System.Drawing.Point(0, 486)
         Me.tsVVEExhaustExIn.Name = "tsVVEExhaustExIn"
         Me.tsVVEExhaustExIn.Size = New System.Drawing.Size(588, 50)
         Me.tsVVEExhaustExIn.TabIndex = 46
@@ -3129,7 +3102,7 @@ Partial Class frmMain
         '
         Me.Label20.AutoSize = True
         Me.Label20.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Label20.Location = New System.Drawing.Point(3, 460)
+        Me.Label20.Location = New System.Drawing.Point(3, 466)
         Me.Label20.Name = "Label20"
         Me.Label20.Size = New System.Drawing.Size(582, 20)
         Me.Label20.TabIndex = 36
@@ -3140,7 +3113,7 @@ Partial Class frmMain
         Me.tsVVEExhaustCam2.AutoSize = False
         Me.tsVVEExhaustCam2.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsVVEExhaustCam2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsVVEExhaustCam2BtnPaste, Me.tsVVEExhaustCam2BtnCopy, Me.ToolStripSeparator23, Me.tsVVEExhaustCam2BtnClear})
-        Me.tsVVEExhaustCam2.Location = New System.Drawing.Point(588, 250)
+        Me.tsVVEExhaustCam2.Location = New System.Drawing.Point(588, 253)
         Me.tsVVEExhaustCam2.Name = "tsVVEExhaustCam2"
         Me.tsVVEExhaustCam2.Size = New System.Drawing.Size(588, 50)
         Me.tsVVEExhaustCam2.TabIndex = 48
@@ -3252,7 +3225,7 @@ Partial Class frmMain
         'tsTuneBtnViewVVENew
         '
         Me.tsTuneBtnViewVVENew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tsTuneBtnViewVVENew.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsTuneMnuViewVVENew, Me.tsTuneMnuViewError, Me.tsTuneMnuViewVVEOld, Me.tsTarget})
+        Me.tsTuneBtnViewVVENew.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsTuneMnuViewVVENew, Me.tsTuneMnuViewError, Me.tsTuneMnuViewVVEOld, Me.tsAutotune})
         Me.tsTuneBtnViewVVENew.Image = CType(resources.GetObject("tsTuneBtnViewVVENew.Image"), System.Drawing.Image)
         Me.tsTuneBtnViewVVENew.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.tsTuneBtnViewVVENew.ImageTransparentColor = System.Drawing.Color.Magenta
@@ -3266,21 +3239,27 @@ Partial Class frmMain
         Me.tsTuneMnuViewVVENew.CheckState = System.Windows.Forms.CheckState.Checked
         Me.tsTuneMnuViewVVENew.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
         Me.tsTuneMnuViewVVENew.Name = "tsTuneMnuViewVVENew"
-        Me.tsTuneMnuViewVVENew.Size = New System.Drawing.Size(180, 26)
+        Me.tsTuneMnuViewVVENew.Size = New System.Drawing.Size(151, 26)
         Me.tsTuneMnuViewVVENew.Text = "VVE New"
         '
         'tsTuneMnuViewError
         '
         Me.tsTuneMnuViewError.Font = New System.Drawing.Font("Segoe UI", 12.0!)
         Me.tsTuneMnuViewError.Name = "tsTuneMnuViewError"
-        Me.tsTuneMnuViewError.Size = New System.Drawing.Size(180, 26)
+        Me.tsTuneMnuViewError.Size = New System.Drawing.Size(151, 26)
         Me.tsTuneMnuViewError.Text = "Total Error"
         '
         'tsTuneMnuViewVVEOld
         '
         Me.tsTuneMnuViewVVEOld.Name = "tsTuneMnuViewVVEOld"
-        Me.tsTuneMnuViewVVEOld.Size = New System.Drawing.Size(180, 26)
+        Me.tsTuneMnuViewVVEOld.Size = New System.Drawing.Size(151, 26)
         Me.tsTuneMnuViewVVEOld.Text = "VVE Old"
+        '
+        'tsAutotune
+        '
+        Me.tsAutotune.Name = "tsAutotune"
+        Me.tsAutotune.Size = New System.Drawing.Size(151, 26)
+        Me.tsAutotune.Text = "Autotune"
         '
         'ToolStripSeparator16
         '
@@ -3446,6 +3425,33 @@ Partial Class frmMain
         Me.btnSplitOrientationTune.TabIndex = 43
         Me.btnSplitOrientationTune.UseVisualStyleBackColor = True
         '
+        'Graph3D_VVE
+        '
+        Me.Graph3D_VVE.AllowuserEdit = False
+        Me.Graph3D_VVE.AxisX_Breakpoints = Nothing
+        Me.Graph3D_VVE.AxisX_Color = System.Drawing.Color.DarkBlue
+        Me.Graph3D_VVE.AxisX_Legend = Nothing
+        Me.Graph3D_VVE.AxisY_Breakpoints = Nothing
+        Me.Graph3D_VVE.AxisY_Color = System.Drawing.Color.DarkGreen
+        Me.Graph3D_VVE.AxisY_Legend = Nothing
+        Me.Graph3D_VVE.AxisZ_Color = System.Drawing.Color.DarkRed
+        Me.Graph3D_VVE.AxisZ_Legend = Nothing
+        Me.Graph3D_VVE.AxisZ_TickInterval = 500
+        Me.Graph3D_VVE.BackColor = System.Drawing.Color.White
+        Me.Graph3D_VVE.BorderColor = System.Drawing.Color.FromArgb(CType(CType(180, Byte), Integer), CType(CType(180, Byte), Integer), CType(CType(180, Byte), Integer))
+        Me.Graph3D_VVE.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Graph3D_VVE.DrawAxisLabels = True
+        Me.Graph3D_VVE.DrawAxisLines = True
+        Me.Graph3D_VVE.Location = New System.Drawing.Point(0, 0)
+        Me.Graph3D_VVE.MAPZoneBoundaryMatrix = Nothing
+        Me.Graph3D_VVE.Name = "Graph3D_VVE"
+        Me.Graph3D_VVE.PolygonLineColor = System.Drawing.Color.Black
+        Me.Graph3D_VVE.Raster = Graph3D.Plot3D.Graph3D.eRaster.Off
+        Me.Graph3D_VVE.RPMZoneBoundaries = Nothing
+        Me.Graph3D_VVE.Size = New System.Drawing.Size(372, 672)
+        Me.Graph3D_VVE.TabIndex = 18
+        Me.Graph3D_VVE.TopLegendColor = System.Drawing.Color.White
+        '
         'Graph3D_Tune
         '
         Me.Graph3D_Tune.AllowuserEdit = False
@@ -3472,12 +3478,6 @@ Partial Class frmMain
         Me.Graph3D_Tune.Size = New System.Drawing.Size(581, 616)
         Me.Graph3D_Tune.TabIndex = 1
         Me.Graph3D_Tune.TopLegendColor = System.Drawing.Color.FromArgb(CType(CType(200, Byte), Integer), CType(CType(200, Byte), Integer), CType(CType(150, Byte), Integer))
-        '
-        'tsTarget
-        '
-        Me.tsTarget.Name = "tsTarget"
-        Me.tsTarget.Size = New System.Drawing.Size(180, 26)
-        Me.tsTarget.Text = "Target VVE"
         '
         'frmMain
         '
@@ -3856,5 +3856,5 @@ Partial Class frmMain
     Friend WithEvents spinBrushAgressiveness As NumericUpDown
     Friend WithEvents chkUseBrush As CheckBox
     Friend WithEvents Graph3D_VVE As Graph3D.Plot3D.Graph3D
-    Friend WithEvents tsTarget As ToolStripMenuItem
+    Friend WithEvents tsAutotune As ToolStripMenuItem
 End Class

@@ -2,6 +2,7 @@
 Imports Graph3D
 Imports MathNet
 Imports MathNet.Numerics
+Imports MathNet.Numerics.LinearRegression
 
 
 
@@ -1674,9 +1675,113 @@ Public Class clsMath
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+    Public Sub GaussianSmoothMAP_FromGrid(ByRef GRD As DataGridView,
+                                               Optional sigma As Double = 1.0,
+                                               Optional window As Integer = 3)
+
+        If GRD Is Nothing Then Exit Sub
+
+        Dim rows As Integer = GRD.Rows.Count
+        Dim cols As Integer = GRD.Columns.Count
+
+        ' weights
+        Dim w(window * 2 + 1) As Double
+        For i As Integer = -window To window
+            w(i + window) = Math.Exp(-(i * i) / (2 * sigma * sigma))
+        Next
+
+        ' copy current values
+        Dim out(rows - 1, cols - 1) As Double
+        For r = 0 To rows - 1
+            For c = 0 To cols - 1
+                out(r, c) = CDbl(GRD(c, r).Value)
+            Next
+        Next
+
+        ' per-column smoothing on highlighted rows
+        For c = 0 To cols - 1
+
+            ' find rows in this column that are selected by user
+            Dim selRows As New List(Of Integer)
+            For r = 0 To rows - 1
+                If GRD(c, r).Selected Then selRows.Add(r)
+            Next
+
+            If selRows.Count = 0 Then Continue For
+
+            ' for each selected row, smooth vertically around it
+            For Each rSel In selRows
+
+                Dim v As Double = CDbl(GRD(c, rSel).Value)
+                If v = 0 Then Continue For
+
+                Dim acc As Double = 0
+                Dim wsum As Double = 0
+
+                For k = -window To window
+                    Dim rr = rSel + k
+                    If rr < 0 OrElse rr >= rows Then Continue For
+
+                    Dim vk As Double = CDbl(GRD(c, rr).Value)
+                    If vk = 0 Then Continue For
+
+                    Dim wk As Double = w(k + window)
+                    acc += vk * wk
+                    wsum += wk
+                Next
+
+                If wsum > 0 Then
+                    out(rSel, c) = acc / wsum
+                End If
+
+            Next
+        Next
+
+        ' write back only selected cells
+        For c = 0 To cols - 1
+            For r = 0 To rows - 1
+                If GRD(c, r).Selected Then
+                    GRD(c, r).Value = out(r, c)
+                End If
+            Next
+        Next
+
+
+    End Sub
+
+
+
+
+
+
+
+
+
+
+
     Public Function GaussianSmoothMAP(ByVal DT As DataTable,
-                                    Optional sigma As Double = 1.0,
-                                    Optional window As Integer = 3) As DataTable
+                                      Optional sigma As Double = 1.0,
+                                      Optional window As Integer = 3) As DataTable
+        ' Sigma
+        '   how wide the gaussian bell is
+        '   bigger sigma = smoother (more neighbors influence)
+        '   small sigma = only close neighbors matter
+        ' 
+        ' Window
+        '   how many cells to look each side
+        '   window=3 looks r-3…r+3 (7 samples)
+        '   bigger window = larger smoothing span
 
         ' precompute gaussian weights
         Dim w(window * 2 + 1) As Double
@@ -1688,15 +1793,15 @@ Public Class clsMath
         Next
 
         Dim rows As Integer = DT.Rows.Count
-        Dim cols As Integer = dt.Columns.Count
+        Dim cols As Integer = DT.Columns.Count
 
         ' output clone
-        Dim out = dt.Copy()
+        Dim out = DT.Copy()
 
         For c As Integer = 0 To cols - 1
             For r As Integer = 0 To rows - 1
 
-                Dim v As Double = CDbl(dt.Rows(r)(c))
+                Dim v As Double = CDbl(DT.Rows(r)(c))
                 If v = 0 Then
                     ' leave as is
                     out.Rows(r)(c) = 0
@@ -1710,7 +1815,7 @@ Public Class clsMath
                     Dim rr As Integer = r + k
                     If rr < 0 OrElse rr >= rows Then Continue For
 
-                    Dim vk As Double = CDbl(dt.Rows(rr)(c))
+                    Dim vk As Double = CDbl(DT.Rows(rr)(c))
                     If vk = 0 Then Continue For
 
                     Dim wk As Double = w(k + window)
@@ -1730,7 +1835,7 @@ Public Class clsMath
         ' copy back
         For r As Integer = 0 To rows - 1
             For c As Integer = 0 To cols - 1
-                dt.Rows(r)(c) = out.Rows(r)(c)
+                DT.Rows(r)(c) = out.Rows(r)(c)
             Next
         Next
 
@@ -1739,6 +1844,385 @@ Public Class clsMath
 
 
 
+
+
+
+    Public Function GaussianSmoothRPM(ByVal DT As DataTable,
+                                      Optional sigma As Double = 1.0,
+                                      Optional window As Integer = 3) As DataTable
+        ' Sigma
+        '   how wide the gaussian bell is
+        '   bigger sigma = smoother (more neighbors influence)
+        '   small sigma = only close neighbors matter
+        ' 
+        ' Window
+        '   how many cells to look each side
+        '   window=3 looks r-3…r+3 (7 samples)
+        '   bigger window = larger smoothing span
+
+        ' weights
+        Dim w(window * 2 + 1) As Double
+        Dim sumW As Double = 0
+        For i As Integer = -window To window
+            Dim g As Double = Math.Exp(-(i * i) / (2 * sigma * sigma))
+            w(i + window) = g
+            sumW += g
+        Next
+
+        Dim rows As Integer = DT.Rows.Count
+        Dim cols As Integer = DT.Columns.Count
+        Dim out = DT.Copy()
+
+        For r As Integer = 0 To rows - 1
+            For c As Integer = 0 To cols - 1
+
+                Dim v As Double = CDbl(DT.Rows(r)(c))
+                If v = 0 Then
+                    out.Rows(r)(c) = 0
+                    Continue For
+                End If
+
+                Dim acc As Double = 0
+                Dim wsum As Double = 0
+
+                For k As Integer = -window To window
+                    Dim cc As Integer = c + k
+                    If cc < 0 OrElse cc >= cols Then Continue For
+
+                    Dim vk As Double = CDbl(DT.Rows(r)(cc))
+                    If vk = 0 Then Continue For
+
+                    Dim wk As Double = w(k + window)
+                    acc += vk * wk
+                    wsum += wk
+                Next
+
+                If wsum > 0 Then
+                    out.Rows(r)(c) = acc / wsum
+                Else
+                    out.Rows(r)(c) = v
+                End If
+
+            Next
+        Next
+
+        ' copy back
+        For r As Integer = 0 To rows - 1
+            For c As Integer = 0 To cols - 1
+                DT.Rows(r)(c) = out.Rows(r)(c)
+            Next
+        Next
+
+        Return DT
+    End Function
+
+
+    Public Function ExtrapolateMAPEdges(ByVal DT As DataTable) As DataTable
+
+        Dim rows As Integer = DT.Rows.Count
+        Dim cols As Integer = DT.Columns.Count
+
+        For c As Integer = 0 To cols - 1
+
+            ' bottom → upward
+            ' find first non-zero from bottom
+            Dim firstNZrow As Integer = -1
+            For r As Integer = 0 To rows - 1
+                If CDbl(DT.Rows(r)(c)) <> 0 Then
+                    firstNZrow = r
+                    Exit For
+                End If
+            Next
+
+            If firstNZrow > 0 Then
+                ' use slope = v(firstNZ) - v(next)  (if next exists)
+                Dim v0 As Double = CDbl(DT.Rows(firstNZrow)(c))
+                Dim v1 As Double = v0
+                If firstNZrow + 1 < rows AndAlso CDbl(DT.Rows(firstNZrow + 1)(c)) <> 0 Then
+                    v1 = CDbl(DT.Rows(firstNZrow + 1)(c))
+                End If
+                Dim slopeDown As Double = v0 - v1
+
+                ' fill down to row 0
+                Dim cur As Double = v0
+                For r As Integer = firstNZrow - 1 To 0 Step -1
+                    cur += slopeDown
+                    DT.Rows(r)(c) = cur
+                Next
+            End If
+
+            ' top → downward
+            Dim lastNZrow As Integer = -1
+            For r As Integer = rows - 1 To 0 Step -1
+                If CDbl(DT.Rows(r)(c)) <> 0 Then
+                    lastNZrow = r
+                    Exit For
+                End If
+            Next
+
+            If lastNZrow >= 0 AndAlso lastNZrow < rows - 1 Then
+                Dim v0 As Double = CDbl(DT.Rows(lastNZrow)(c))
+                Dim v1 As Double = v0
+                If lastNZrow - 1 >= 0 AndAlso CDbl(DT.Rows(lastNZrow - 1)(c)) <> 0 Then
+                    v1 = CDbl(DT.Rows(lastNZrow - 1)(c))
+                End If
+                Dim slopeUp As Double = v1 - v0
+
+                Dim cur As Double = v0
+                For r As Integer = lastNZrow + 1 To rows - 1
+                    cur += slopeUp
+                    DT.Rows(r)(c) = cur
+                Next
+            End If
+
+        Next
+
+        Return DT
+    End Function
+
+
+
+
+    Public Function ExtrapolateMAPEdgesQuadratic(ByVal DT As DataTable) As DataTable
+
+        Dim rows As Integer = DT.Rows.Count
+        Dim cols As Integer = DT.Columns.Count
+
+        For c As Integer = 0 To cols - 1
+
+            ' gather interior points
+            Dim xs As New List(Of Double)
+            Dim ys As New List(Of Double)
+
+            For r As Integer = 0 To rows - 1
+                Dim v As Double = CDbl(DT.Rows(r)(c))
+                If v <> 0 Then
+                    xs.Add(r)
+                    ys.Add(v)
+                End If
+            Next
+
+            If xs.Count < 3 Then Continue For ' need >=3 for quadratic
+
+            ' design matrix for polynomial regression order=2
+            Dim X(xs.Count - 1)() As Double
+            For i As Integer = 0 To xs.Count - 1
+                Dim rr = xs(i)
+                X(i) = New Double() {1, rr, rr * rr}
+            Next
+
+            Dim y = ys.ToArray()
+
+            ' coef = [a,b,c]
+            'Dim coef = MultipleRegression.QR(X, y, directSolve:=True)
+            Dim coef = MultipleRegression.QR(X, y)
+
+            Dim a = coef(0)
+            Dim b = coef(1)
+            Dim cc = coef(2)
+
+            ' fill missing using curve
+            For r As Integer = 0 To rows - 1
+                Dim v As Double = CDbl(DT.Rows(r)(c))
+                If v = 0 Then
+                    Dim pred = a + b * r + cc * r * r
+                    DT.Rows(r)(c) = pred
+                End If
+            Next
+
+        Next
+
+        Return DT
+    End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    Public Function ExtrapolateMAPEdges(ByVal DT As DataTable,
+                                        ByVal windowSize As Integer) As DataTable
+
+        Dim rows = DT.Rows.Count
+        Dim cols = DT.Columns.Count
+
+        For c As Integer = 0 To cols - 1
+
+            ' ---- bottom window ----
+            Dim bottom As New List(Of Tuple(Of Integer, Double))
+            For r As Integer = 0 To rows - 1
+                Dim v = CDbl(DT.Rows(r)(c))
+                If v <> 0 Then bottom.Add(Tuple.Create(r, v))
+                If bottom.Count = windowSize Then Exit For
+            Next
+            If bottom.Count >= 2 Then
+                FillSideLinear(DT, c, bottom, 0, bottom.First().Item1)
+            End If
+
+            ' ---- top window ----
+            Dim top As New List(Of Tuple(Of Integer, Double))
+            For r As Integer = rows - 1 To 0 Step -1
+                Dim v = CDbl(DT.Rows(r)(c))
+                If v <> 0 Then top.Add(Tuple.Create(r, v))
+                If top.Count = windowSize Then Exit For
+            Next
+            If top.Count >= 2 Then
+                FillSideLinear(DT, c, top, top.First().Item1, rows - 1)
+            End If
+
+        Next
+
+        Return DT
+    End Function
+
+
+    ' Simple linear least squares (r,val) pairs
+    Private Sub FillSideLinear(ByRef DT As DataTable,
+                               ByVal c As Integer,
+                               ByVal pts As List(Of Tuple(Of Integer, Double)),
+                               ByVal rStart As Integer,
+                               ByVal rEnd As Integer)
+
+        ' compute a,b for y = a + b*r
+        Dim n = pts.Count
+        Dim sumX As Double = 0
+        Dim sumY As Double = 0
+        Dim sumXY As Double = 0
+        Dim sumXX As Double = 0
+
+        For Each t In pts
+            Dim x = t.Item1
+            Dim y = t.Item2
+            sumX += x
+            sumY += y
+            sumXY += x * y
+            sumXX += x * x
+        Next
+
+        Dim denom = (n * sumXX - sumX * sumX)
+        If denom = 0 Then Exit Sub
+
+        Dim b = (n * sumXY - sumX * sumY) / denom
+        Dim a = (sumY - b * sumX) / n
+
+        For r As Integer = rStart To rEnd
+            If CDbl(DT.Rows(r)(c)) = 0 Then
+                DT.Rows(r)(c) = a + b * r
+            End If
+        Next
+
+    End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+    Public Function ExtrapolateMAPEdgesQuadratic(ByVal DT As DataTable,
+                                                 ByVal windowSize As Integer) As DataTable
+
+        Dim rows = DT.Rows.Count
+        Dim cols = DT.Columns.Count
+
+        For c As Integer = 0 To cols - 1
+
+            ' ---- Bottom window ----
+            Dim bottomPts As New List(Of Tuple(Of Integer, Double))
+            For r As Integer = 0 To rows - 1
+                Dim v = CDbl(DT.Rows(r)(c))
+                If v <> 0 Then bottomPts.Add(Tuple.Create(r, v))
+                If bottomPts.Count = windowSize Then Exit For
+            Next
+
+            If bottomPts.Count >= 3 Then
+                FillSide(DT, c, bottomPts, 0, bottomPts.First().Item1)
+            End If
+
+            ' ---- Top window ----
+            Dim topPts As New List(Of Tuple(Of Integer, Double))
+            For r As Integer = rows - 1 To 0 Step -1
+                Dim v = CDbl(DT.Rows(r)(c))
+                If v <> 0 Then topPts.Add(Tuple.Create(r, v))
+                If topPts.Count = windowSize Then Exit For
+            Next
+
+            If topPts.Count >= 3 Then
+                FillSide(DT, c, topPts, topPts.First().Item1, rows - 1)
+            End If
+
+        Next
+
+        Return DT
+    End Function
+
+
+
+
+    ' Fit quadratic to pts and fill zeros in [rStart..rEnd]
+    Private Function FillSide(ByVal DT As DataTable,
+                            ByVal c As Integer,
+                            ByVal pts As List(Of Tuple(Of Integer, Double)),
+                            ByVal rStart As Integer,
+                            ByVal rEnd As Integer) As DataTable
+
+        ' Fit using pts (same as prior example)
+        Dim X(pts.Count - 1)() As Double
+        Dim y(pts.Count - 1) As Double
+
+        For i As Integer = 0 To pts.Count - 1
+            Dim rr = pts(i).Item1
+            Dim vv = pts(i).Item2
+            X(i) = New Double() {1, rr, rr * rr}
+            y(i) = vv
+        Next
+
+        Dim coef = MathNet.Numerics.LinearRegression.MultipleRegression.QR(X, y, True)
+        Dim a = coef(0)
+        Dim b = coef(1)
+        Dim cc = coef(2)
+
+        For r As Integer = rStart To rEnd
+            If CDbl(DT.Rows(r)(c)) = 0 Then
+                DT.Rows(r)(c) = a + b * r + cc * r * r
+            End If
+        Next
+
+        Return DT
+    End Function
 
 
 End Class

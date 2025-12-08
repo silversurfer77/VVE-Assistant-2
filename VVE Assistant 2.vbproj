@@ -86,6 +86,12 @@
     <Compile Include="clsMath.vb" />
     <Compile Include="clsMulti_Datatable.vb" />
     <Compile Include="clsZones.vb" />
+    <Compile Include="frmAutotune.Designer.vb">
+      <DependentUpon>frmAutotune.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAutotune.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmPopOutEditor.Designer.vb">
       <DependentUpon>frmPopOutEditor.vb</DependentUpon>
     </Compile>
@@ -129,6 +135,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmAutotune.resx">
+      <DependentUpon>frmAutotune.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmPopOutEditor.resx">
       <DependentUpon>frmPopOutEditor.vb</DependentUpon>
     </EmbeddedResource>

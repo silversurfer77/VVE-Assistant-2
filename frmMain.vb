@@ -5,6 +5,7 @@
 
 'Imports System.Windows.Forms.LinkLabel
 'Imports System.Windows.Forms.VisualStyles.VisualStyleElement
+Imports System.Runtime.InteropServices.ComTypes
 Imports System.Security.AccessControl
 Imports System.Threading
 Imports Graph3D
@@ -52,6 +53,21 @@ Public Class frmMain
 
     Dim SMALL_ZONE_WARN As Boolean = True
 
+    Dim DT_WORKING_VVE As clsMulti_Datatable
+
+
+
+
+    Public Sub New()
+
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+
+        AddHandler Graph3D_Tune.PointValueChanged, AddressOf UpdateWorkingVVEFromChart
+        AddHandler Graph3D_VVE.PointValueChanged, AddressOf UpdateVVEFromChart
+    End Sub
 
     Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
@@ -69,7 +85,7 @@ Public Class frmMain
 
             'My.Settings.HistoLow = System.Drawing.Color.Green
 
-            grdVVE.SelectionMode = DataGridViewSelectionMode.CellSelect
+            'grdVVE.SelectionMode = DataGridViewSelectionMode.CellSelect
 
             SetupWidgetRelationships()
 
@@ -183,7 +199,11 @@ Public Class frmMain
                 'Coeff_to_BaseVVE(GetGridManager(grdTune))
 
                 ' will be called to refresh the tune tab incase the user manually edited the coeff
-                tsTuneMnuViewVVENew_Click(Nothing, Nothing)
+                If Not tsAutotune.Checked Then
+                    ' we do this otherwise it will immediately autotune or warn you that it was already autotuned, avoid that
+                    tsTuneMnuViewVVENew_Click(Nothing, Nothing)
+                End If
+
 
                 FORM_STATE = enmFORM_STATE.Normal
 
@@ -924,12 +944,7 @@ Public Class frmMain
         Graph3D_VVE.AxisZ_TickInterval = 500
         Graph3D_VVE.DrawAxisLabels = False
         Graph3D_VVE.DrawAxisLines = False
-
-        Console.WriteLine("2) SelectionMode = " & grdVVE.SelectionMode.ToString)
         Graph3D_VVE.SetHighlightedPolygons(GetSelectionFromGrid(grdVVE))
-        Console.WriteLine("4) SelectionMode = " & grdVVE.SelectionMode.ToString)
-
-
 
         'Graph3D_VVE.RPMZoneBoundaries = {1000, 2000, 2600, 3600}
         Graph3D_VVE.RPMZoneBoundaries = clsLib.DT_To_1D_Array_DBL(GetGridManager(grdZoneRPM).DataSource)
@@ -984,8 +999,6 @@ Public Class frmMain
         'Dim objDT_New As DataTable = DisplayVVE() 'DirectCast(grdTune.DataSource, DataTable)
         Dim objDT_New As DataTable = GetGridManager(grdTune).DataSource
         '--------------------------------------------------------------------------------------------------------------------
-
-        Console.WriteLine("SelectionMode = " & grdVVE.SelectionMode.ToString)
 
         If objDT_New Is Nothing Then
             HasData = False
@@ -1042,11 +1055,21 @@ Public Class frmMain
 
 
 
-    Private Sub grdVVE_CellStateChanged(sender As Object, e As DataGridViewCellStateChangedEventArgs) Handles grdVVE.CellStateChanged
+    Private Sub grd_CellStateChanged(sender As Object, e As DataGridViewCellStateChangedEventArgs) Handles grdVVE.CellStateChanged, grdTune.CellStateChanged
+        ' this code will fire logic to highlight the 3D grid polygons based on the cells the user has highlighted in the datagrid
         Try
 
-            Graph3D_VVE.SetHighlightedPolygons(GetSelectionFromGrid(grdVVE))
-            Graph3D_VVE.Invalidate()
+            Dim GRD As DataGridView = CType(sender, DataGridView)
+
+            If GRD Is grdVVE Then
+                Graph3D_VVE.SetHighlightedPolygons(GetSelectionFromGrid(GRD))
+                Graph3D_VVE.Invalidate()
+            End If
+
+            If GRD Is grdTune Then
+                Graph3D_Tune.SetHighlightedPolygons(GetSelectionFromGrid(GRD))
+                Graph3D_Tune.Invalidate()
+            End If
 
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical)
@@ -1125,7 +1148,7 @@ Public Class frmMain
         ' wrap both of these calls into Try/Catch blocks since they are calling 3rd party code. If this fails, at least allow the cell painting and zones to render
         If GRD_MGR.Grid.Equals(grdVVE) Or GRD_MGR.Grid.Equals(grdZoneRPM) Or GRD_MGR.Grid.Equals(grdZoneMAP) Then
             Try
-                grdVVE.SelectionMode = DataGridViewSelectionMode.CellSelect
+                'grdVVE.SelectionMode = DataGridViewSelectionMode.CellSelect
                 Paint_3D_Graphs()
             Catch ex As Exception
                 MsgBox("Error rendering 3D chart: " & ex.Message, MsgBoxStyle.Critical)
@@ -1463,7 +1486,7 @@ Public Class frmMain
                                                                                     tsTuneMnuViewError.Click,
                                                                                     tsTuneMnuViewVVENew.Click,
                                                                                     tsTuneMnuViewVVEOld.Click,
-                                                                                    tsTarget.Click
+                                                                                    tsAutotune.Click
 
         'Dim COL_SCROLL As Integer = 0
         'Dim ROW_SCROLL As Integer = 0
@@ -1492,7 +1515,7 @@ Public Class frmMain
                 tsTuneMnuViewError.Checked = True
                 tsTuneMnuViewVVENew.Checked = False
                 tsTuneMnuViewVVEOld.Checked = False
-                tsTarget.Checked = False
+                tsAutotune.Checked = False
 
                 DisplayPasteSpecial()
 
@@ -1500,7 +1523,7 @@ Public Class frmMain
                 tsTuneMnuViewError.Checked = False
                 tsTuneMnuViewVVENew.Checked = True
                 tsTuneMnuViewVVEOld.Checked = False
-                tsTarget.Checked = False
+                tsAutotune.Checked = False
 
                 DisplayVVE()
 
@@ -1508,18 +1531,18 @@ Public Class frmMain
                 tsTuneMnuViewError.Checked = False
                 tsTuneMnuViewVVENew.Checked = False
                 tsTuneMnuViewVVEOld.Checked = True
-                tsTarget.Checked = False
+                tsAutotune.Checked = False
 
                 DisplayVVE()
 
-            ElseIf sender.Equals(tsTarget) Then
+            ElseIf sender.Equals(tsAutotune) Then
                 tsTuneMnuViewError.Checked = False
                 tsTuneMnuViewVVENew.Checked = False
                 tsTuneMnuViewVVEOld.Checked = False
-                tsTarget.Checked = True
+                tsAutotune.Checked = True
 
 
-                CreateTagetVVEWithNulls()
+                Autotune(False)
 
             End If
 
@@ -1578,8 +1601,6 @@ Public Class frmMain
             Dim GRD_MGR As clsGridManager = GetGridManager(grdTune)
             GRD_MGR.DecimalPlaces = 0
             GRD_MGR.SetDatatable(DT_FINAL, ROW_HEADERS)
-
-            Console.WriteLine("SelectionMode = " & grdVVE.SelectionMode.ToString)
         End If
 
         ' this will be used to paint the final VVE 3D chart
@@ -1749,7 +1770,7 @@ Public Class frmMain
     End Sub
 
 
-    Private Function CreateTagetVVEWithNulls() As DataTable
+    Public Function Autotune(ByVal FORCE_PAINT_3D_CART As Boolean) As DataTable
         ' this is needed to create the VVE target (raw VVE values, not with percents)
         ' there will be nulls and we will interpolate those gaps
         ' we will also raise/lower the edges of the data to match.
@@ -1757,49 +1778,197 @@ Public Class frmMain
         ' to match the raw VVE breakpoints from teh scanner, so first
         ' we have to use the coefficients to re-create the VVE table...
 
+        Try
+            Me.Cursor = Cursors.WaitCursor
+
+            If Not DTs_HAVE_DATA({GetGridManager(grdHisto).DataSource, GetGridManager(grdVVE).DataSource}) Then
+                Return New DataTable
+            End If
+
+            Dim MSG_RES As MsgBoxResult = MsgBoxResult.Yes
+            If DT_WORKING_VVE IsNot Nothing Then
+                MSG_RES = MsgBox("You have already begun VVE tuning, do you want to start over and lose all your work?" & vbCrLf & vbCrLf &
+                          "Yes = Start Over" & vbCrLf &
+                          "No = Cancel",
+                          MsgBoxStyle.Question Or MsgBoxStyle.YesNo)
 
 
-        If Not DTs_HAVE_DATA({GetGridManager(grdHisto).DataSource, GetGridManager(grdVVE).DataSource}) Then
-            Return New DataTable
-        End If
-
-        Dim MATH As New clsMath(SMALL_ZONE_WARN)
-        Dim DT_VVE_ADJUSTED_BREAKPOINTS As DataTable = MATH.CreateVVEFromCoeffAndBreakpoints(GetGridManager(grdVVEConst).DataSource,
-                                                                                             GetGridManager(grdVVEMAP).DataSource,
-                                                                                             GetGridManager(grdVVEMAP2).DataSource,
-                                                                                             GetGridManager(grdVVERPM).DataSource,
-                                                                                             GetGridManager(grdVVERPM2).DataSource,
-                                                                                             GetGridManager(grdVVEMAPRPM).DataSource,
-                                                                                             GetGridManager(grdZoneRPM).DataSource,
-                                                                                             GetGridManager(grdZoneMAP).DataSource,
-                                                                                             GetGridManager(grdHisto).RowHeaders_STR,
-                                                                                             GetGridManager(grdHisto).ColumnHeaders_STR,
-                                                                                             GetGridManager(grdVVE).DataSource,
-                                                                                             mnuOptionsVerlonModeSDPatch.Checked)
-
-        Dim DT_TARGET_WITH_NULL As DataTable = clsLib.PasteSpecialMultiplyPercent_Datatables(DT_VVE_ADJUSTED_BREAKPOINTS,
-                                                                                             GetGridManager(grdHisto).DataSource,
-                                                                                             True)
+                If MSG_RES = MsgBoxResult.No Then
+                    Return New DataTable
+                End If
+            End If
 
 
+            Dim AUTOTUNE_DIALOG As frmAutotune
+            Dim OPEN_AUTOTUNE_DIALOG As Boolean = True
+            For Each frm As Form In Application.OpenForms
+                If TypeOf frm Is frmAutotune Then
+                    OPEN_AUTOTUNE_DIALOG = False
+
+                    AUTOTUNE_DIALOG = frm
+                    If AUTOTUNE_DIALOG.FORMLOADING Then
+                        Return Nothing
+                    End If
+                End If
+            Next
+
+            If OPEN_AUTOTUNE_DIALOG Then
+                AUTOTUNE_DIALOG = New frmAutotune()
+                AUTOTUNE_DIALOG.Owner = Me
+                AUTOTUNE_DIALOG.Show(Me)
+            End If
 
 
 
-        ' Interpolate MAP values as much as possible
-        Dim DT_TARGET_WITH_INTERPOLATION As DataTable = MATH.InterpolateInteriorMAP(DT_TARGET_WITH_NULL)
-
-        ' Interpolate one and only one RPM gap
-        DT_TARGET_WITH_INTERPOLATION = MATH.InterpolateOneRPMValue(DT_TARGET_WITH_INTERPOLATION)
-
-        ' Smooth with the grain
-        DT_TARGET_WITH_INTERPOLATION = MATH.GaussianSmoothMAP(DT_TARGET_WITH_INTERPOLATION)
 
 
-        Dim GRD_MGR As clsGridManager = GetGridManager(grdTune)
-        GRD_MGR.DecimalPlaces = 0
-        GRD_MGR.SetDatatable(DT_TARGET_WITH_INTERPOLATION, GetGridManager(grdTune).RowHeaders_STR)
 
-        Return DT_TARGET_WITH_INTERPOLATION
+            ' if starting over, start from a clean slate
+            DT_WORKING_VVE = Nothing
+
+            Dim MATH As New clsMath(SMALL_ZONE_WARN)
+            Dim DT_TARGET_WITH_INTERPOLATION As DataTable
+
+            If MSG_RES = MsgBoxResult.Yes Then
+                Dim DT_VVE_ADJUSTED_BREAKPOINTS As DataTable = MATH.CreateVVEFromCoeffAndBreakpoints(GetGridManager(grdVVEConst).DataSource,
+                                                                                                 GetGridManager(grdVVEMAP).DataSource,
+                                                                                                 GetGridManager(grdVVEMAP2).DataSource,
+                                                                                                 GetGridManager(grdVVERPM).DataSource,
+                                                                                                 GetGridManager(grdVVERPM2).DataSource,
+                                                                                                 GetGridManager(grdVVEMAPRPM).DataSource,
+                                                                                                 GetGridManager(grdZoneRPM).DataSource,
+                                                                                                 GetGridManager(grdZoneMAP).DataSource,
+                                                                                                 GetGridManager(grdHisto).RowHeaders_STR,
+                                                                                                 GetGridManager(grdHisto).ColumnHeaders_STR,
+                                                                                                 GetGridManager(grdVVE).DataSource,
+                                                                                                 mnuOptionsVerlonModeSDPatch.Checked)
+
+                Dim DT_TARGET_WITH_NULL As DataTable = clsLib.PasteSpecialMultiplyPercent_Datatables(DT_VVE_ADJUSTED_BREAKPOINTS,
+                                                                                                 GetGridManager(grdHisto).DataSource,
+                                                                                                 True)
+                DT_TARGET_WITH_INTERPOLATION = DT_TARGET_WITH_NULL
+            End If
+
+            If MSG_RES = MsgBoxResult.No Then
+                DT_TARGET_WITH_INTERPOLATION = DT_WORKING_VVE.GetCurrentDT
+            End If
+
+
+
+            If AUTOTUNE_DIALOG.InterpolateMAP Then
+                ' Interpolate MAP values as much as possible
+                DT_TARGET_WITH_INTERPOLATION = MATH.InterpolateInteriorMAP(DT_TARGET_WITH_INTERPOLATION)
+            End If
+
+
+            If AUTOTUNE_DIALOG.InterpolateRPM Then
+                ' Interpolate one and only one RPM gap
+                DT_TARGET_WITH_INTERPOLATION = MATH.InterpolateOneRPMValue(DT_TARGET_WITH_INTERPOLATION)
+            End If
+
+
+            If AUTOTUNE_DIALOG.SmoothMAP Then
+                ' Smooth with the grain
+                DT_TARGET_WITH_INTERPOLATION = MATH.GaussianSmoothMAP(DT_TARGET_WITH_INTERPOLATION,
+                                                                  AUTOTUNE_DIALOG.SmoothMAPSigma,
+                                                                  AUTOTUNE_DIALOG.SmoothMAPWindow)
+            End If
+
+
+            If AUTOTUNE_DIALOG.SmoothRPM Then
+                ' Smooth against the grain
+                DT_TARGET_WITH_INTERPOLATION = MATH.GaussianSmoothRPM(DT_TARGET_WITH_INTERPOLATION,
+                                                                  AUTOTUNE_DIALOG.SmoothRPMSigma,
+                                                                  AUTOTUNE_DIALOG.SmoothRPMWindow)
+            End If
+
+
+            If AUTOTUNE_DIALOG.ExtrapolateMAPLinear And Not AUTOTUNE_DIALOG.ExtrapolateMAPQuadratic Then
+                ' Fill in the missing MAP data for the upper and lower MAP values
+                ' we will use the liner and quadratic methods to predict, and then
+                ' we will average them for a final result
+
+
+                DT_TARGET_WITH_INTERPOLATION = MATH.ExtrapolateMAPEdges(DT_TARGET_WITH_INTERPOLATION,
+                                                                        AUTOTUNE_DIALOG.ExtrapolateMAPLinearWindow)
+
+            ElseIf Not AUTOTUNE_DIALOG.ExtrapolateMAPLinear And AUTOTUNE_DIALOG.ExtrapolateMAPQuadratic Then
+                'DT_TARGET_WITH_INTERPOLATION = MATH.ExtrapolateMAPEdgesQuadratic(DT_TARGET_WITH_INTERPOLATION,
+                '                                                                 AUTOTUNE_DIALOG.ExtrapolateMAPQuadraticWindow)
+                Dim DT_Quadratic As DataTable = MATH.ExtrapolateMAPEdgesQuadratic(DT_TARGET_WITH_INTERPOLATION)
+
+
+
+
+            ElseIf AUTOTUNE_DIALOG.ExtrapolateMAPLinear And AUTOTUNE_DIALOG.ExtrapolateMAPQuadratic Then
+
+                Dim DT_Linear As DataTable = MATH.ExtrapolateMAPEdges(DT_TARGET_WITH_INTERPOLATION.Copy,
+                                                                      AUTOTUNE_DIALOG.ExtrapolateMAPLinearWindow)
+
+                'Dim DT_Quadratic As DataTable = MATH.ExtrapolateMAPEdgesQuadratic(DT_TARGET_WITH_INTERPOLATION,
+                '                                                              AUTOTUNE_DIALOG.ExtrapolateMAPQuadraticWindow)
+                Dim DT_Quadratic As DataTable = MATH.ExtrapolateMAPEdgesQuadratic(DT_TARGET_WITH_INTERPOLATION.Copy)
+
+                Dim DT_AVE As DataTable = clsLib.Compute_Average_DT({DT_Linear, DT_Quadratic})
+
+                DT_TARGET_WITH_INTERPOLATION = DT_AVE
+
+            End If
+
+
+            If AUTOTUNE_DIALOG.FillRPMviaVVE Then
+                ' default in the rest of the datatable where we don't have fuel trime data and cannot predict the results
+                DT_TARGET_WITH_INTERPOLATION = clsLib.DT_ReplaceZeroValuesWithDefaultValues(GetGridManager(grdVVE).DataSource, DT_TARGET_WITH_INTERPOLATION)
+            End If
+
+
+
+
+
+
+
+
+
+            If AUTOTUNE_DIALOG.SmoothRPM Then
+                ' Smooth against the grain
+                DT_TARGET_WITH_INTERPOLATION = MATH.GaussianSmoothRPM(DT_TARGET_WITH_INTERPOLATION,
+                                                                  AUTOTUNE_DIALOG.SmoothRPMSigma,
+                                                                  AUTOTUNE_DIALOG.SmoothRPMWindow)
+            End If
+
+
+            If AUTOTUNE_DIALOG.InterpolateMAP Then
+                ' Interpolate MAP values as much as possible
+                DT_TARGET_WITH_INTERPOLATION = MATH.InterpolateInteriorMAP(DT_TARGET_WITH_INTERPOLATION)
+            End If
+
+
+
+
+
+            Dim GRD_MGR As clsGridManager = GetGridManager(grdTune)
+            GRD_MGR.DecimalPlaces = 0
+            GRD_MGR.SetDatatable(DT_TARGET_WITH_INTERPOLATION, GetGridManager(grdTune).RowHeaders_STR)
+
+
+
+            If DT_WORKING_VVE Is Nothing Then
+                DT_WORKING_VVE = New clsMulti_Datatable(DT_TARGET_WITH_INTERPOLATION)
+            Else
+                DT_WORKING_VVE.AppendNewDT(DT_TARGET_WITH_INTERPOLATION)
+            End If
+
+            If FORCE_PAINT_3D_CART Then
+                Paint_3D_Graphs()
+            End If
+
+            Return DT_TARGET_WITH_INTERPOLATION
+
+        Catch ex As Exception
+            Throw ex
+        Finally
+            Me.Cursor = Cursors.Default
+        End Try
 
     End Function
 
@@ -1897,11 +2066,15 @@ Public Class frmMain
             Dim objMath As New clsMath(SMALL_ZONE_WARN)
             Dim ROW_HEADERS() As String = GetGridManager(grdHisto).RowHeaders_STR
 
-            GetGridManager(grdTune).SetDatatable(objMath.SmoothSelectedCells(grdTune.SelectedCells,
-                                                                             GetGridManager(grdTune).DataSource(False)),
-                                                 ROW_HEADERS)
+            'GetGridManager(grdTune).SetDatatable(objMath.SmoothSelectedCells(grdTune.SelectedCells,
+            '                                     GetGridManager(grdTune).DataSource(False)),
+            '                                     ROW_HEADERS)
+            'CalcCoeffFromBaseVVE(GetGridManager(grdTune).DataSource, ROW_HEADERS, True)
 
-            CalcCoeffFromBaseVVE(GetGridManager(grdTune).DataSource, ROW_HEADERS, True)
+
+
+            objMath.GaussianSmoothMAP_FromGrid(grdTune)
+            GetGridManager(grdTune).SetDatatable(GetGridManager(grdTune).DataSource, ROW_HEADERS)
             Paint_3D_Graphs()
 
 
@@ -2018,6 +2191,38 @@ Public Class frmMain
             MsgBox(ex.Message, MsgBoxStyle.Critical)
         End Try
     End Sub
+
+
+    Public Sub UpdateWorkingVVEFromChart(ByVal X As Integer, ByVal Y As Integer, ByVal NewZ As Double)
+
+
+        If Graph3D_Tune.IsCurrentlyEditing Then
+            Exit Sub
+        End If
+
+        Dim DT As DataTable = GetGridManager(grdTune).DataSource
+        DT.Rows(X).Item(Y) = NewZ
+
+        Dim ROW_HEADERS() As String = GetGridManager(grdTune).RowHeaders_STR
+        GetGridManager(grdTune).SetDatatable(DT, ROW_HEADERS)
+
+    End Sub
+
+
+    Private Sub UpdateVVEFromChart(ByVal X As Integer, ByVal Y As Integer, ByVal NewZ As Double)
+
+        If Graph3D_VVE.IsCurrentlyEditing Then
+            Exit Sub
+        End If
+
+        Dim DT As DataTable = GetGridManager(grdVVE).DataSource
+        DT.Rows(X).Item(Y) = NewZ
+
+        Dim ROW_HEADERS() As String = GetGridManager(grdVVE).RowHeaders_STR
+        GetGridManager(grdVVE).SetDatatable(DT, ROW_HEADERS)
+
+    End Sub
+
 
 
 End Class

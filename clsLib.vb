@@ -521,18 +521,65 @@ Public Class clsLib
         For i As Integer = 0 To DT_IN.Rows.Count - 1
             For j As Integer = 0 To DT_IN.Columns.Count - 1
 
-
                 TEMP_OBJ = DT_IN.Rows(i).Item(j)
                 RESULT = 0
 
                 Integer.TryParse(Math.Round(TEMP_OBJ, 0).ToString, RESULT)
                 VVE(i, j) = RESULT
-
             Next
         Next
 
         Return VVE
     End Function
+
+
+
+
+
+    Public Shared Function Array2D_To_DT(ByVal ARR(,) As Integer) As DataTable
+
+        If ARR Is Nothing Then Return Nothing
+
+        Dim ROWS As Integer = ARR.GetLength(0)
+        Dim COLS As Integer = ARR.GetLength(1)
+
+        Dim DT As New DataTable()
+
+        ' columns
+        For c As Integer = 0 To cols - 1
+            dt.Columns.Add("C" & c, GetType(Double))
+        Next
+
+        ' rows
+        For r As Integer = 0 To rows - 1
+            Dim dr As DataRow = dt.NewRow()
+            For c As Integer = 0 To cols - 1
+                dr(c) = CDbl(ARR(r, c))
+            Next
+            dt.Rows.Add(dr)
+        Next
+
+        Return dt
+    End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     Public Shared Function DT_To_2D_Array_DBL(ByVal DT_IN As DataTable) As Double(,)
         ' this is used to pass in MAP zone data to the 3D chart.
@@ -1022,7 +1069,23 @@ Public Class clsLib
 
     End Function
 
+    Public Shared Function DT_ReplaceZeroValuesWithDefaultValues(ByVal DT_Default As DataTable, ByVal DT_Working As DataTable) As DataTable
 
+        Dim ERR As String = ""
+        If Verify_DTs_Match(DT_Default, DT_Working, ERR) Then
+            Throw New Exception(ERR)
+        End If
+
+        For i As Integer = 0 To DT_Working.Rows.Count - 1
+            For j As Integer = 0 To DT_Working.Columns.Count - 1
+                If DT_Working.Rows(i).Item(j) = 0 Then
+                    DT_Working.Rows(i).Item(j) = DT_Default.Rows(i).Item(j)
+                End If
+            Next
+        Next
+
+        Return DT_Working
+    End Function
 
 
 
