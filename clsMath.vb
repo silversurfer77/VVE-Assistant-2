@@ -199,7 +199,7 @@ Public Class clsMath
         Dim VVE() As Double
         Dim COEFF() As Double
 
-        Dim objZones As New clsZones(RPM_Boundaries, MAP_Boundaries, ROW_HEADERS)
+        Dim objZones As New clsZones(RPM_Boundaries, MAP_Boundaries)
         Dim CURRENT_RPM As Double = 0.0
         Dim CURRENT_MAP As Double = 0.0
         Dim CURRENT_VVE As Double = 0.0
@@ -532,7 +532,7 @@ Public Class clsMath
         Dim VVE() As Double
         Dim COEFF() As Double
 
-        Dim objZones As New clsZones(RPM_Boundaries, MAP_Boundaries, ROW_HEADERS)
+        Dim objZones As New clsZones(RPM_Boundaries, MAP_Boundaries)
         Dim CURRENT_RPM As Double = 0.0
         Dim CURRENT_MAP As Double = 0.0
         Dim CURRENT_VVE As Double = 0.0
@@ -818,7 +818,7 @@ Public Class clsMath
         Dim VVE() As Double
         Dim COEFF() As Double
 
-        Dim objZones As New clsZones(RPM_Boundaries, MAP_Boundaries, ROW_HEADERS)
+        Dim objZones As New clsZones(RPM_Boundaries, MAP_Boundaries)
         Dim CURRENT_RPM As Double = 0.0
         Dim CURRENT_MAP As Double = 0.0
         Dim CURRENT_VVE As Double = 0.0
@@ -1526,9 +1526,8 @@ Public Class clsMath
                                                      ByVal COEFF_MAPRPM As DataTable,
                                                      ByVal DT_RPM_ZONE_DEF As DataTable,
                                                      ByVal DT_MAP_ZONE_DEF As DataTable,
-                                                     ByVal MAP_BREAKPOINTS() As String,
-                                                     ByVal RPM_BREAKPOINTS() As String,
-                                                     ByVal VVE_RAW_FROM_EDITOR As DataTable,
+                                                     ByVal MAP_BREAKPOINTS() As Double,
+                                                     ByVal RPM_BREAKPOINTS() As Double,
                                                      ByVal VERLON_MODE As Boolean) As DataTable
 
         ' since we do not know if the breakpoints from the SCANNER match the EDITOR
@@ -1540,7 +1539,7 @@ Public Class clsMath
             DT_VVE_CORRECTED_BREAKPOINTS.Columns.Add(RPM_BREAKPOINTS(i), GetType(Decimal))
         Next
 
-        Dim objZones As New clsZones(DT_RPM_ZONE_DEF, DT_MAP_ZONE_DEF, MAP_BREAKPOINTS)
+        Dim objZones As New clsZones(DT_RPM_ZONE_DEF, DT_MAP_ZONE_DEF)
         Dim NEW_ROW As DataRow
         Dim CURRENT_ZONE As Integer = -1
         Dim ConstCoeff As Double = 0.0
@@ -1549,10 +1548,7 @@ Public Class clsMath
         Dim RPMCoeff As Double = 0.0
         Dim RPM2Coeff As Double = 0.0
         Dim MAPRPMCoeff As Double = 0.0
-
         Dim AirMass As Double = 0.0
-
-
 
         For i As Integer = 0 To MAP_BREAKPOINTS.Length - 1
             NEW_ROW = DT_VVE_CORRECTED_BREAKPOINTS.NewRow()
@@ -1573,14 +1569,14 @@ Public Class clsMath
 
 
                 AirMass = CalcVVEAirmass(ConstCoeff,
-                                            MAPCoeff,
-                                            MAP2Coeff,
-                                            RPMCoeff,
-                                            RPM2Coeff,
-                                            MAPRPMCoeff,
-                                            CDbl(MAP_BREAKPOINTS(i)),
-                                            CDbl(RPM_BREAKPOINTS(j)),
-                                            VERLON_MODE)
+                                         MAPCoeff,
+                                         MAP2Coeff,
+                                         RPMCoeff,
+                                         RPM2Coeff,
+                                         MAPRPMCoeff,
+                                         CDbl(MAP_BREAKPOINTS(i)),
+                                         CDbl(RPM_BREAKPOINTS(j)),
+                                         VERLON_MODE)
 
 
 

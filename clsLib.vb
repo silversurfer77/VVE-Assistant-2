@@ -436,71 +436,93 @@ Public Class clsLib
         End If
     End Sub
 
-    Public Shared Sub FindMaxDataTableValue(ByVal objDT As DataTable, ByRef Max As Double, ByRef Min As Double)
-        ' iterate through every cell to determine the absolute min and max values
-        ' we will need this information to apply the heatmap backcolors
 
-        If objDT Is Nothing Then
-            Exit Sub
-        End If
+    Public Shared Sub FindMaxDataTableValue(ByVal dt As DataTable,
+                            ByRef minVal As Double,
+                            ByRef maxVal As Double)
 
-        If objDT.Rows.Count = 0 Then
-            Exit Sub
-        End If
+        minVal = Double.MaxValue
+        maxVal = Double.MinValue
 
-        If objDT.Columns.Count = 0 Then
-            Exit Sub
-        End If
+        Dim rows = dt.Rows.Count
+        Dim cols = dt.Columns.Count
 
-        Max = Double.MinValue
-        Min = Double.MaxValue
-
-        ' better performance?
-        ' putting each row into an array
-        ' sorting array
-        ' start at index 0 and going up to look for the smallest number that exists
-        ' start at last index and going down to look for the largest number that exists
-        ' this way we only do a partial iteration for each row/col, rather than iterating across all of them
-
-        Dim row(-1) As Object
-        Dim ParseResult As Double = 0.0
-
-        ' THIS ERRORS ON DBNULL!
-        ' NEED TO FIX IT SO WE CAN ITERATE LESS (bring back the Exit For)
-        'Array.Sort(row)
-        For j As Integer = 0 To row.Length - 1
-            'If IsDBNull(row(j)) Then
-            '    Continue For
-            'End If
-            'If Not Double.IsInfinity(row(j)) Then
-            '    Continue For
-            'End If
-            'If Not IsNumeric(row(j)) Then
-            '    Continue For
-            'End If
-
-            If Double.TryParse(row(j).ToString, ParseResult) = False Then
-                Continue For
-            End If
+        For r As Integer = 0 To rows - 1
+            Dim dr = dt.Rows(r)
+            For c As Integer = 0 To cols - 1
+                Dim v As Double = CDbl(dr(c))
+                If v < minVal Then minVal = v
+                If v > maxVal Then maxVal = v
+            Next
         Next
-
-        For k As Integer = row.Length - 1 To 0 Step -1
-            'If IsDBNull(row(k)) Then
-            '    Continue For
-            'End If
-            'If Not Double.IsInfinity(row(k)) Then
-            '    Continue For
-            'End If
-            'If Not IsNumeric(row(k)) Then
-            '    Continue For
-            'End If
-
-            If Double.TryParse(row(k).ToString, ParseResult) = False Then
-                Continue For
-            End If
-        Next
-
     End Sub
+
+
+    'Public Shared Sub FindMaxDataTableValue(ByVal objDT As DataTable, ByRef Max As Double, ByRef Min As Double)
+    '    ' iterate through every cell to determine the absolute min and max values
+    '    ' we will need this information to apply the heatmap backcolors
+
+    '    If objDT Is Nothing Then
+    '        Exit Sub
+    '    End If
+
+    '    If objDT.Rows.Count = 0 Then
+    '        Exit Sub
+    '    End If
+
+    '    If objDT.Columns.Count = 0 Then
+    '        Exit Sub
+    '    End If
+
+    '    Max = Double.MinValue
+    '    Min = Double.MaxValue
+
+    '    ' better performance?
+    '    ' putting each row into an array
+    '    ' sorting array
+    '    ' start at index 0 and going up to look for the smallest number that exists
+    '    ' start at last index and going down to look for the largest number that exists
+    '    ' this way we only do a partial iteration for each row/col, rather than iterating across all of them
+
+    '    Dim row(-1) As Object
+    '    Dim ParseResult As Double = 0.0
+
+    '    ' THIS ERRORS ON DBNULL!
+    '    ' NEED TO FIX IT SO WE CAN ITERATE LESS (bring back the Exit For)
+    '    'Array.Sort(row)
+    '    For j As Integer = 0 To row.Length - 1
+    '        'If IsDBNull(row(j)) Then
+    '        '    Continue For
+    '        'End If
+    '        'If Not Double.IsInfinity(row(j)) Then
+    '        '    Continue For
+    '        'End If
+    '        'If Not IsNumeric(row(j)) Then
+    '        '    Continue For
+    '        'End If
+
+    '        If Double.TryParse(row(j).ToString, ParseResult) = False Then
+    '            Continue For
+    '        End If
+    '    Next
+
+    '    For k As Integer = row.Length - 1 To 0 Step -1
+    '        'If IsDBNull(row(k)) Then
+    '        '    Continue For
+    '        'End If
+    '        'If Not Double.IsInfinity(row(k)) Then
+    '        '    Continue For
+    '        'End If
+    '        'If Not IsNumeric(row(k)) Then
+    '        '    Continue For
+    '        'End If
+
+    '        If Double.TryParse(row(k).ToString, ParseResult) = False Then
+    '            Continue For
+    '        End If
+    '    Next
+
+    'End Sub
 
     Public Shared Function DT_To_2D_Array(ByVal DT_IN As DataTable) As Integer(,)
         If DT_IN Is Nothing Then
@@ -531,55 +553,6 @@ Public Class clsLib
 
         Return VVE
     End Function
-
-
-
-
-
-    Public Shared Function Array2D_To_DT(ByVal ARR(,) As Integer) As DataTable
-
-        If ARR Is Nothing Then Return Nothing
-
-        Dim ROWS As Integer = ARR.GetLength(0)
-        Dim COLS As Integer = ARR.GetLength(1)
-
-        Dim DT As New DataTable()
-
-        ' columns
-        For c As Integer = 0 To cols - 1
-            dt.Columns.Add("C" & c, GetType(Double))
-        Next
-
-        ' rows
-        For r As Integer = 0 To rows - 1
-            Dim dr As DataRow = dt.NewRow()
-            For c As Integer = 0 To cols - 1
-                dr(c) = CDbl(ARR(r, c))
-            Next
-            dt.Rows.Add(dr)
-        Next
-
-        Return dt
-    End Function
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     Public Shared Function DT_To_2D_Array_DBL(ByVal DT_IN As DataTable) As Double(,)
         ' this is used to pass in MAP zone data to the 3D chart.
@@ -655,19 +628,19 @@ Public Class clsLib
             Return True
         End If
 
-        Dim ROWHEADERS() As String = clsLib.ReadArrayFromFile(clsLib.GetZoneFileName)
+        'Dim ROWHEADERS() As String = clsLib.ReadArrayFromFile(clsLib.GetZoneFileName)
 
-        If ROWHEADERS.Length <> DT_NEW.Rows.Count Then
+        'If ROWHEADERS.Length <> DT_NEW.Rows.Count Then
+        '    ERR_REASON = "New table has more [rows] than are defined in the zone definition."
+        '    Return False
+        'End If
+
+        If DT_OLD.Rows.Count <> DT_NEW.Rows.Count Then
             ERR_REASON = "New table has more [rows] than are defined in the zone definition."
             Return False
         End If
 
-        If Not DT_OLD.Rows.Count = DT_NEW.Rows.Count Then
-            ERR_REASON = "New table has more [rows] than are defined in the zone definition."
-            Return False
-        End If
-
-        If Not DT_OLD.Columns.Count = DT_NEW.Columns.Count Then
+        If DT_OLD.Columns.Count <> DT_NEW.Columns.Count Then
             ERR_REASON = "New table has more [columns] than are defined in the zone definition."
             Return False
         End If
@@ -1072,7 +1045,7 @@ Public Class clsLib
     Public Shared Function DT_ReplaceZeroValuesWithDefaultValues(ByVal DT_Default As DataTable, ByVal DT_Working As DataTable) As DataTable
 
         Dim ERR As String = ""
-        If Verify_DTs_Match(DT_Default, DT_Working, ERR) Then
+        If Not Verify_DTs_Match(DT_Default, DT_Working, ERR) Then
             Throw New Exception(ERR)
         End If
 
@@ -1379,31 +1352,127 @@ Public Class clsLib
         Next
     End Sub
 
-    Public Shared Sub Paint_VVE_Editor_Style(ByRef GRD As DataGridView, ByVal e As DataGridViewCellPaintingEventArgs)
+    'Public Shared Sub Paint_VVE_Editor_Style(ByRef GRD As DataGridView, ByVal e As DataGridViewCellPaintingEventArgs)
 
+    '    If GRD.Rows.Count = 0 Or GRD.Columns.Count = 0 Then
+    '        Exit Sub
+    '    End If
+    '    If e.RowIndex < 0 Or e.ColumnIndex < 0 Then
+    '        Exit Sub
+    '    End If
+    '    If Convert.IsDBNull(e.Value) Then
+    '        Exit Sub
+    '    End If
+
+    '    Dim r As Integer = 0
+    '    Dim g As Integer = 0
+    '    Dim b As Integer = 0
+    '    'Dim MID As Double = 0.66
+    '    Dim MIN As Double = 0
+    '    Dim MAX As Double = 1
+    '    FindMaxDataTableValue(CType(GRD.DataSource, DataTable), MAX, MIN)
+
+    '    ' test to see if the FindMaxDataTableValue() sub has encountered errors or problems (specifically with NaN or infinity numbers)
+    '    If MAX = Double.MinValue Or MIN = Double.MaxValue Then
+    '        GRD.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = Color.FromArgb(211, 211, 211)
+    '        Exit Sub
+    '    End If
+
+    '    If MIN = MAX And MIN = 0.0 Then
+    '        GRD.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = Color.FromArgb(255, 255, 255)
+    '        Exit Sub
+    '    ElseIf MIN = MAX Then
+    '        MAX += 1
+    '    End If
+    '    Dim RATIO As Double = CDbl((CDbl(e.Value) - MIN)) / (MAX - MIN)
+
+    '    If RATIO <= 0.66 Then
+    '        r = CInt((255 * (RATIO / 0.66)))
+    '        g = 255
+    '        b = 0
+    '    Else
+    '        r = 255
+    '        g = CInt((255 - (RATIO - 0.66) / (1.0 - 0.66) * (255 - 165)))
+    '        b = 0
+    '    End If
+
+    '    If r < 0 Then
+    '        r = 0
+    '    End If
+
+    '    If g < 0 Then
+    '        g = 0
+    '    End If
+
+    '    If b < 0 Then
+    '        b = 0
+    '    End If
+
+    '    If r > 255 Then
+    '        r = 255
+    '    End If
+
+    '    If g > 255 Then
+    '        g = 255
+    '    End If
+
+    '    If b > 255 Then
+    '        b = 255
+    '    End If
+
+    '    GRD.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = Color.FromArgb(r, g, b)
+    'End Sub
+
+
+    Public Shared Sub Paint_VVE_Editor_Style(ByRef GRD As DataGridView,
+                                             ByVal e As DataGridViewCellPaintingEventArgs,
+                                             ByVal MAX As Double,
+                                             ByVal MIN As Double,
+                                             Optional ByVal COLOR_INTENSITY As Decimal = 0.5)
+        If GRD Is Nothing Then
+            Exit Sub
+        End If
         If GRD.Rows.Count = 0 Or GRD.Columns.Count = 0 Then
             Exit Sub
         End If
         If e.RowIndex < 0 Or e.ColumnIndex < 0 Then
             Exit Sub
         End If
+        If GRD.Item(e.ColumnIndex, e.RowIndex).Selected Then
+            Exit Sub
+        End If
         If Convert.IsDBNull(e.Value) Then
+            GRD.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = Color.FromArgb(255, 255, 255)
             Exit Sub
         End If
 
         Dim r As Integer = 0
         Dim g As Integer = 0
         Dim b As Integer = 0
-        'Dim MID As Double = 0.66
-        Dim MIN As Double = 0.0
-        Dim MAX As Double = 1.0
-        FindMaxDataTableValue(CType(GRD.DataSource, DataTable), MAX, MIN)
+        Dim MID As Double = COLOR_INTENSITY ' .5 is the most HPT like
+
+
+        ' OLD and SLOW
+        'Dim MIN As Double = 0.0
+        'Dim MAX As Double = 1.0
+        'FindMaxDataTableValue(CType(GRD.DataSource, DataTable), MAX, MIN)
+
+        'Dim MIN As Double = FindMinDataTableValue(DirectCast(GRD.DataSource, DataTable))
+        'Dim MAX As Double = FindMaxDataTableValue(DirectCast(GRD.DataSource, DataTable))
+
+
+        If MAX = 0.0 And MIN = 0.0 Then
+            FindMaxDataTableValue(CType(GRD.DataSource, DataTable), MAX, MIN)
+        End If
+
+
 
         ' test to see if the FindMaxDataTableValue() sub has encountered errors or problems (specifically with NaN or infinity numbers)
         If MAX = Double.MinValue Or MIN = Double.MaxValue Then
             GRD.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = Color.FromArgb(211, 211, 211)
             Exit Sub
         End If
+
 
         If MIN = MAX And MIN = 0.0 Then
             GRD.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = Color.FromArgb(255, 255, 255)
@@ -1413,13 +1482,13 @@ Public Class clsLib
         End If
         Dim RATIO As Double = CDbl((CDbl(e.Value) - MIN)) / (MAX - MIN)
 
-        If RATIO <= 0.66 Then
-            r = CInt((255 * (RATIO / 0.66)))
+        If RATIO <= MID Then
+            r = CInt((255 * (RATIO / MID)))
             g = 255
             b = 0
         Else
             r = 255
-            g = CInt((255 - (RATIO - 0.66) / (1.0 - 0.66) * (255 - 165)))
+            g = CInt((255 - (RATIO - MID) / (1.0 - MID) * (255 - 165)))
             b = 0
         End If
 
@@ -1449,6 +1518,96 @@ Public Class clsLib
 
         GRD.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = Color.FromArgb(r, g, b)
     End Sub
+
+
+    Public Shared Sub Paint_Histo_Scanner_Style2(ByRef GRD As DataGridView, ByVal cell_row As Integer, ByVal cell_col As Integer)
+        If GRD Is Nothing Then
+            Exit Sub
+        End If
+        If GRD.Rows.Count = 0 Or GRD.Columns.Count = 0 Then
+            Exit Sub
+        End If
+        ' THIS IS THE SPEED SECRET!
+        If cell_row < 0 Or cell_col < 0 Then
+            Exit Sub
+        End If
+        If GRD.Item(cell_col, cell_row).Selected Then
+            Exit Sub
+        End If
+
+        Dim VAL_TEST As Object = GRD.Item(cell_col, cell_row).Value
+        Dim VAL As Decimal = 0.0
+        If Not IsNumeric(VAL_TEST) Then
+            GRD.Rows(cell_row).Cells.Item(cell_col).Style.BackColor = Color.White
+            Exit Sub
+        Else
+            VAL = CDec(VAL_TEST)
+        End If
+
+
+
+        ' heatmap vars
+        Dim INTENSITY As Decimal = 0.0
+        'Dim MID As Byte = 0
+        Dim INTENSITY_SCALE As Decimal = 5.0
+        Dim cell_color As Color = Color.White
+        Dim HISTO_LOW As Color = My.Settings.HistoLow
+        Dim HISTO_HIGH As Color = My.Settings.HistoHigh
+
+
+        ' paint backcolor: heatmap 
+
+        ' determine the intensity percent
+        INTENSITY = Math.Abs(VAL - 0.0) / Math.Abs(INTENSITY_SCALE)
+        INTENSITY = 255 - (255 * INTENSITY)
+
+        ' ensure we do not exceed the RGB color max/min (0-255)
+        If INTENSITY > 255.0 Then
+            INTENSITY = 255.0
+        End If
+        If INTENSITY < 0.0 Then
+            INTENSITY = 0.0
+        End If
+
+        ' apply backcolor to cell
+        If VAL < 0.0 Then
+            'rich/high values
+
+            If HISTO_LOW = System.Drawing.Color.Red Then
+                cell_color = Color.FromArgb(255, INTENSITY, INTENSITY)
+
+            ElseIf HISTO_LOW = System.Drawing.Color.Green Then
+                cell_color = Color.FromArgb(INTENSITY, 255, INTENSITY)
+
+            ElseIf HISTO_LOW = System.Drawing.Color.Blue Then
+                cell_color = Color.FromArgb(INTENSITY, INTENSITY, 255)
+
+            ElseIf HISTO_LOW = System.Drawing.Color.White Then
+                cell_color = Color.FromArgb(255, 255, 255)
+            End If
+
+        ElseIf VAL > 0.0 Then
+            'lean/low values
+
+            If HISTO_HIGH = System.Drawing.Color.Red Then
+                cell_color = Color.FromArgb(255, INTENSITY, INTENSITY)
+
+            ElseIf HISTO_HIGH = System.Drawing.Color.Green Then
+                cell_color = Color.FromArgb(INTENSITY, 255, INTENSITY)
+
+            ElseIf HISTO_HIGH = System.Drawing.Color.Blue Then
+                cell_color = Color.FromArgb(INTENSITY, INTENSITY, 255)
+
+            ElseIf HISTO_HIGH = System.Drawing.Color.White Then
+                cell_color = Color.FromArgb(255, 255, 255)
+            End If
+        End If
+
+        GRD.Rows(cell_row).Cells.Item(cell_col).Style.BackColor = cell_color
+
+    End Sub
+
+
 
     'Public Shared Function PaintGridZonesAndHeatmap(ByVal grd As DataGridView, ByVal objDT_All_Zones As DataTable,
     '                                                ByVal intZoneNumber As Integer, ByRef intBookmarkRow As Integer,

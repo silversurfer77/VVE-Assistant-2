@@ -79,16 +79,16 @@ Public Class frmCamImport
 
 
 
-    Private Sub grdVVECam_CellPainting(ByVal sender As Object, ByVal e As DataGridViewCellPaintingEventArgs) Handles grdVVECam.CellPainting
-        Try
-            If grdVVECam.Rows.Count = 0 Then
-                Exit Sub
-            End If
-            clsLib.Paint_VVE_Editor_Style(grdVVECam, e)
-        Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Critical)
-        End Try
-    End Sub
+    'Private Sub grdVVECam_CellPainting(ByVal sender As Object, ByVal e As DataGridViewCellPaintingEventArgs) Handles grdVVECam.CellPainting
+    '    Try
+    '        If grdVVECam.Rows.Count = 0 Then
+    '            Exit Sub
+    '        End If
+    '        clsLib.Paint_VVE_Editor_Style(grdVVECam, e)
+    '    Catch ex As Exception
+    '        MsgBox(ex.Message, MsgBoxStyle.Critical)
+    '    End Try
+    'End Sub
 
     Private Sub grd_ColumnAdded(sender As Object, e As DataGridViewColumnEventArgs) Handles grdVVECam.ColumnAdded
         Try

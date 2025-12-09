@@ -144,18 +144,18 @@ Public Class frmPopOutEditor
         End Try
     End Sub
 
-    Private Sub grdZoneMAP_CellPainting(sender As Object, e As DataGridViewCellPaintingEventArgs) Handles grdZoneMAP.CellPainting, grdZoneRPM.CellPainting
-        Try
-            If _FORM_LOADING Then
-                Exit Sub
-            End If
+    'Private Sub grdZoneMAP_CellPainting(sender As Object, e As DataGridViewCellPaintingEventArgs) Handles grdZoneMAP.CellPainting, grdZoneRPM.CellPainting
+    '    Try
+    '        If _FORM_LOADING Then
+    '            Exit Sub
+    '        End If
 
-            Dim GRD As DataGridView = DirectCast(sender, DataGridView)
-            clsLib.Paint_VVE_Editor_Style(GRD, e)
-        Catch ex As Exception
+    '        Dim GRD As DataGridView = DirectCast(sender, DataGridView)
+    '        clsLib.Paint_VVE_Editor_Style(GRD, e)
+    '    Catch ex As Exception
 
-        End Try
-    End Sub
+    '    End Try
+    'End Sub
 
     Private Sub grd_ColumnAdded(sender As Object, e As DataGridViewColumnEventArgs) Handles grdZoneMAP.ColumnAdded,
                                                                                             grdZoneRPM.ColumnAdded

@@ -142,7 +142,7 @@
 
             chkAverage.Checked = chkExtrapolateMAPLinear.Checked And chkExtrapolateMAPQuadratic.Checked
 
-            frmMain.Autotune(True)
+            frmMain.Autotune()
 
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical)
