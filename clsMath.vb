@@ -1683,56 +1683,90 @@ Public Class clsMath
 
 
     Public Sub GaussianSmoothMAP_FromGrid(ByRef GRD As DataGridView,
-                                               Optional sigma As Double = 1.0,
-                                               Optional window As Integer = 3)
+                                          Optional sigma As Double = 1.0,
+                                          Optional window As Integer = 3)
 
-        If GRD Is Nothing Then Exit Sub
+        If GRD Is Nothing Then
+            Exit Sub
+        End If
+        If GRD.Rows.Count = 0 Then
+            Exit Sub
+        End If
+        If GRD.Columns.Count = 0 Then
+            Exit Sub
+        End If
 
-        Dim rows As Integer = GRD.Rows.Count
-        Dim cols As Integer = GRD.Columns.Count
+        Dim rows As Integer = GRD.Rows.Count - 1
+        Dim cols As Integer = GRD.Columns.Count - 1
 
         ' weights
-        Dim w(window * 2 + 1) As Double
+        Dim w((window * 2) + 1) As Double
         For i As Integer = -window To window
             w(i + window) = Math.Exp(-(i * i) / (2 * sigma * sigma))
         Next
 
         ' copy current values
-        Dim out(rows - 1, cols - 1) As Double
+        Dim out(rows, cols) As Double
         For r = 0 To rows - 1
-            For c = 0 To cols - 1
+            For c = 0 To cols
                 out(r, c) = CDbl(GRD(c, r).Value)
             Next
         Next
 
         ' per-column smoothing on highlighted rows
-        For c = 0 To cols - 1
+        Dim selRows As New List(Of Integer)
+        Dim v As Double = 0.0
+        Dim acc As Double = 0.0
+        Dim wsum As Double = 0.0
+        Dim rr As Integer = 0
+        Dim vk As Double = 0.0
+        Dim wk As Double = 0.0
+
+        For c = 0 To cols
 
             ' find rows in this column that are selected by user
-            Dim selRows As New List(Of Integer)
-            For r = 0 To rows - 1
-                If GRD(c, r).Selected Then selRows.Add(r)
+            'Dim selRows As New List(Of Integer)
+            selRows.Clear()
+
+            For r = 0 To rows
+                If GRD(c, r).Selected Then
+                    selRows.Add(r)
+                End If
             Next
 
-            If selRows.Count = 0 Then Continue For
+            If selRows.Count = 0 Then
+                Continue For
+            End If
 
             ' for each selected row, smooth vertically around it
             For Each rSel In selRows
 
-                Dim v As Double = CDbl(GRD(c, rSel).Value)
-                If v = 0 Then Continue For
+                'Dim v As Double = CDbl(GRD(c, rSel).Value)
+                v = CDbl(GRD(c, rSel).Value)
+                If v = 0 Then
+                    Continue For
+                End If
 
-                Dim acc As Double = 0
-                Dim wsum As Double = 0
+                'Dim acc As Double = 0
+                'Dim wsum As Double = 0
+                acc = 0.0
+                wsum = 0.0
 
                 For k = -window To window
-                    Dim rr = rSel + k
-                    If rr < 0 OrElse rr >= rows Then Continue For
+                    'Dim rr = rSel + k
+                    rr = rSel + k
+                    If rr < 0 OrElse rr >= rows + 1 Then
+                        Continue For
+                    End If
 
-                    Dim vk As Double = CDbl(GRD(c, rr).Value)
-                    If vk = 0 Then Continue For
+                    'Dim vk As Double = CDbl(GRD(c, rr).Value)
+                    vk = CDbl(GRD(c, rr).Value)
+                    If vk = 0 Then
+                        Continue For
+                    End If
 
-                    Dim wk As Double = w(k + window)
+                    'Dim wk As Double = w(k + window)
+                    wk = w(k + window)
                     acc += vk * wk
                     wsum += wk
                 Next
@@ -1745,8 +1779,8 @@ Public Class clsMath
         Next
 
         ' write back only selected cells
-        For c = 0 To cols - 1
-            For r = 0 To rows - 1
+        For c = 0 To cols
+            For r = 0 To rows
                 If GRD(c, r).Selected Then
                     GRD(c, r).Value = out(r, c)
                 End If
@@ -1756,6 +1790,83 @@ Public Class clsMath
 
     End Sub
 
+
+    Public Sub GaussianSmoothMAP_FromGridFast(ByRef GRD As DataGridView,
+                                          Optional sigma As Double = 1.0,
+                                          Optional window As Integer = 3)
+
+        If GRD Is Nothing OrElse GRD.Rows.Count = 0 OrElse GRD.Columns.Count = 0 Then Exit Sub
+
+        Dim rows As Integer = GRD.Rows.Count - 1
+        Dim cols As Integer = GRD.Columns.Count - 1
+
+        ' ---- PRECOMPUTE WEIGHTS ----
+        Dim size As Integer = window * 2 + 1
+        Dim w(size - 1) As Double
+        Dim inv2sig2 As Double = 1.0 / (2 * sigma * sigma)
+
+        For i = -window To window
+            w(i + window) = Math.Exp(-(i * i) * inv2sig2)
+        Next
+
+        ' ---- COPY GRID ONCE ----
+        Dim src(rows, cols) As Double
+        For r = 0 To rows
+            For c = 0 To cols
+                Dim v = GRD(c, r).Value
+                If v IsNot Nothing Then src(r, c) = CDbl(v)
+            Next
+        Next
+
+        Dim out = src.Clone()
+
+        ' ---- PREALLOCATE selection buffer ----
+        Dim sel(rows) As Integer
+        Dim selCount As Integer
+
+        ' ---- PROCESS ----
+        For c = 0 To cols
+
+            ' collect selected row indices for this column
+            selCount = 0
+            For r = 0 To rows
+                If GRD(c, r).Selected Then
+                    sel(selCount) = r
+                    selCount += 1
+                End If
+            Next
+            If selCount = 0 Then Continue For
+
+            ' smooth each selected row
+            For s = 0 To selCount - 1
+
+                Dim rSel = sel(s)
+                Dim acc As Double = 0.0
+                Dim wsum As Double = 0.0
+
+                For k = -window To window
+                    Dim rr = rSel + k
+                    If rr < 0 OrElse rr > rows Then Continue For
+
+                    Dim vk = src(rr, c)
+                    If vk = 0 Then Continue For
+
+                    Dim wk = w(k + window)
+                    acc += vk * wk
+                    wsum += wk
+                Next
+
+                If wsum > 0 Then out(rSel, c) = acc / wsum
+            Next
+        Next
+
+        ' ---- WRITE BACK ----
+        For r = 0 To rows
+            For c = 0 To cols
+                If GRD(c, r).Selected Then GRD(c, r).Value = out(r, c)
+            Next
+        Next
+    End Sub
 
 
 

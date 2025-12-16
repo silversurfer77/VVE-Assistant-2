@@ -18,13 +18,17 @@ Imports eSchema = Graph3D.Plot3D.ColorSchema.eSchema
 Public Class cls3D
     Dim graph3D1 As Plot3D.Graph3D
 
-
     Public Sub New(ByRef graph As Plot3D.Graph3D)
         graph3D1 = graph
     End Sub
 
 
-    Public Sub Plot3D(ByVal values(,) As Integer, Optional ByVal c_Colors() As Color = Nothing, Optional ByVal ARR_Z_AXIS_MAX_MIN_SCALE() As Double = Nothing)
+    Public Sub Plot3D(ByVal values(,) As Double,
+                      Optional ByVal c_Colors() As Color = Nothing,
+                      Optional ByVal ARR_Z_AXIS_MAX_MIN_SCALE() As Double = Nothing)
+
+        ' ARR_Z_AXIS_MAX_MIN_SCALE: pass this is when linking multiple charts together and you want them to maintain the same Z scaling (thinking VVE, intake, exhaust airmass)
+
         SetSurface(values, ARR_Z_AXIS_MAX_MIN_SCALE)
 
         ' get rid of the default axis...the RPM values are wrong...where are they being set in the first place?
@@ -33,17 +37,16 @@ Public Class cls3D
             c_Colors = Graph3D.Plot3D.ColorSchema.GetSchema(CType(My.Settings.GraphColor, eSchema)) 'user defined
         End If
         graph3D1.SetColorScheme(c_Colors, 3)
-
-
-
-
     End Sub
-    Private Sub SetSurface(ByVal s32_Values As Integer(,), Optional ByVal ARR_Z_AXIS_MAX_MIN_SCALE() As Double = Nothing)
+
+
+
+    Private Sub SetSurface(ByVal s32_Values As Double(,), Optional ByVal ARR_Z_AXIS_MAX_MIN_SCALE() As Double = Nothing)
         Dim i_Points3D As cPoint3D(,) = New cPoint3D(s32_Values.GetLength(0) - 1, s32_Values.GetLength(1) - 1) {}
 
         For X As Integer = 0 To s32_Values.GetLength(0) - 1
             For Y As Integer = 0 To s32_Values.GetLength(1) - 1
-                i_Points3D(X, Y) = New cPoint3D(X * 10, Y * 500, s32_Values(X, Y))
+                i_Points3D(X, Y) = New cPoint3D(X, Y, s32_Values(X, Y))
             Next
         Next
 
@@ -52,5 +55,21 @@ Public Class cls3D
         graph3D1.AxisZ_Legend = "VVE"
         graph3D1.SetSurfacePoints(i_Points3D, eNormalize.Separate, ARR_Z_AXIS_MAX_MIN_SCALE)
     End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 End Class

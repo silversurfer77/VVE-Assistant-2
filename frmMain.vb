@@ -265,7 +265,9 @@ Public Class frmMain
             ' force the row headers to paint
             'tabMain_SelectedIndexChanged(Nothing, Nothing)
 
-
+            If FORM_STATE = enmFORM_STATE.Loading Then
+                Exit Sub
+            End If
 
             Paint_3D_Graphs()
 
@@ -1155,44 +1157,51 @@ Public Class frmMain
         ' -----------------
         ' VVE
         ' -----------------
-        Dim obj3D_Old As New cls3D(Graph3D_VVE)
 
-        obj3D_Old.Plot3D({{0, 0}, {0, 0}})
-        Graph3D_VVE.Raster = Graph3D.Plot3D.Graph3D.eRaster.MainAxis
-        Graph3D_VVE.AllowuserEdit = True
-        Graph3D_VVE.AxisX_Breakpoints = GetGridManager(grdVVE).ColumnHeaders
-        Graph3D_VVE.AxisY_Breakpoints = GetGridManager(grdVVE).RowHeaders_DBL
-        Graph3D_VVE.AxisZ_TickInterval = 500
-        Graph3D_VVE.DrawAxisLabels = False
-        Graph3D_VVE.DrawAxisLines = False
-        Graph3D_VVE.SetHighlightedPolygons(GetSelectionFromGrid(grdVVE))
+        'Graph3D_VVE.TotalPoints> 4
 
-        'Graph3D_VVE.RPMZoneBoundaries = {1000, 2000, 2600, 3600}
-        Graph3D_VVE.RPMZoneBoundaries = clsLib.DT_To_1D_Array_DBL(GetGridManager(grdZoneRPM).DataSource)
+        If GetGridManager(grdVVE).DataSource IsNot Nothing Then
 
+            Graph3D_VVE.Raster = Graph3D.Plot3D.Graph3D.eRaster.MainAxis
+            Graph3D_VVE.AllowuserEdit = True
+            Graph3D_VVE.AxisX_Breakpoints = GetGridManager(grdVVE).ColumnHeaders
+            Graph3D_VVE.AxisY_Breakpoints = GetGridManager(grdVVE).RowHeaders_DBL
+            Graph3D_VVE.AxisZ_TickInterval = 500
+            Graph3D_VVE.DrawAxisLabels = False
+            Graph3D_VVE.DrawAxisLines = False
+            Graph3D_VVE.SetHighlightedPolygons(GetSelectionFromGrid(grdVVE))
 
-        'Graph3D_VVE.MAPZoneBoundaryMatrix = {{20, 40, 60, 80, 90}, ' Zone 0-1
-        '                                     {15, 25, 35, 55, 80}, ' Zone 1-2
-        '                                     {30, 40, 50, 75, 90}, ' Zone 2-3
-        '                                     {25, 35, 45, 65, 75}  ' Zone 3-4
-        '                                     }
-        Graph3D_VVE.MAPZoneBoundaryMatrix = clsLib.DT_To_2D_Array_DBL(GetGridManager(grdZoneMAP).DataSource)
+            'Graph3D_VVE.RPMZoneBoundaries = {1000, 2000, 2600, 3600}
+            Graph3D_VVE.RPMZoneBoundaries = clsLib.DT_To_1D_Array_DBL(GetGridManager(grdZoneRPM).DataSource)
 
 
+            'Graph3D_VVE.MAPZoneBoundaryMatrix = {{20, 40, 60, 80, 90}, ' Zone 0-1
+            '                                     {15, 25, 35, 55, 80}, ' Zone 1-2
+            '                                     {30, 40, 50, 75, 90}, ' Zone 2-3
+            '                                     {25, 35, 45, 65, 75}  ' Zone 3-4
+            '                                     }
+            Graph3D_VVE.MAPZoneBoundaryMatrix = clsLib.DT_To_2D_Array_DBL(GetGridManager(grdZoneMAP).DataSource)
 
 
-        Dim objDT_Old As DataTable = DirectCast(grdVVE.DataSource, DataTable)
-        If objDT_Old Is Nothing Then
-            HasData = False
-        ElseIf objDT_Old.Rows.Count = 0 Then
-            HasData = False
-        End If
+            'If Graph3D_VVE.TotalPoints < 4 Then
+            Dim obj3D_Old As New cls3D(Graph3D_VVE)
+            obj3D_Old.Plot3D({{0, 0}, {0, 0}})
+            'End If
 
 
-        If HasData Then
-            Dim VVE_Old(,) As Integer
-            VVE_Old = clsLib.DT_To_2D_Array(objDT_Old)
-            obj3D_Old.Plot3D(VVE_Old)
+            Dim objDT_Old As DataTable = GetGridManager(grdVVE).DataSource
+            If objDT_Old Is Nothing Then
+                HasData = False
+            ElseIf objDT_Old.Rows.Count = 0 Then
+                HasData = False
+            End If
+
+
+            If HasData Then
+                Dim VVE_Old(,) As Double
+                VVE_Old = clsLib.DT_To_2D_Array(objDT_Old)
+                obj3D_Old.Plot3D(VVE_Old)
+            End If
         End If
         ' -----------------
 
@@ -1200,36 +1209,39 @@ Public Class frmMain
         ' -----------------
         ' TUNE
         ' -----------------
-        HasData = True
-        Dim obj3D_New As New cls3D(Graph3D_Tune)
 
-        obj3D_New.Plot3D({{0, 0}, {0, 0}})
-        Graph3D_Tune.Raster = Graph3D.Plot3D.Graph3D.eRaster.MainAxis
-        Graph3D_Tune.AllowuserEdit = True
-        Graph3D_Tune.AxisX_Breakpoints = GetGridManager(grdHisto).ColumnHeaders
-        Graph3D_Tune.AxisY_Breakpoints = GetGridManager(grdHisto).RowHeaders_DBL
-        Graph3D_Tune.AxisZ_TickInterval = 500
-        Graph3D_Tune.DrawAxisLabels = False
-        Graph3D_Tune.DrawAxisLines = False
-        Graph3D_Tune.RPMZoneBoundaries = Graph3D_VVE.RPMZoneBoundaries
-        Graph3D_Tune.MAPZoneBoundaryMatrix = Graph3D_VVE.MAPZoneBoundaryMatrix
+        If GetGridManager(grdTune).DataSource IsNot Nothing Then
+            HasData = True
 
+            Graph3D_Tune.Raster = Graph3D.Plot3D.Graph3D.eRaster.MainAxis
+            Graph3D_Tune.AllowuserEdit = True
+            Graph3D_Tune.AxisX_Breakpoints = GetGridManager(grdHisto).ColumnHeaders
+            Graph3D_Tune.AxisY_Breakpoints = GetGridManager(grdHisto).RowHeaders_DBL
+            Graph3D_Tune.AxisZ_TickInterval = 500
+            Graph3D_Tune.DrawAxisLabels = False
+            Graph3D_Tune.DrawAxisLines = False
+            Graph3D_Tune.RPMZoneBoundaries = Graph3D_VVE.RPMZoneBoundaries
+            Graph3D_Tune.MAPZoneBoundaryMatrix = Graph3D_VVE.MAPZoneBoundaryMatrix
 
-        '-------------------------------------------------------------------------------------------------------------------------
-        ' might want to rethink this as it sets the datatable, etc, might be a performance bummer
-        'Dim objDT_New As DataTable = DisplayVVE() 'DirectCast(grdTune.DataSource, DataTable)
-        Dim objDT_New As DataTable = GetGridManager(grdTune).DataSource
-        '--------------------------------------------------------------------------------------------------------------------
+            Dim obj3D_New As New cls3D(Graph3D_Tune)
+            obj3D_New.Plot3D({{0, 0}, {0, 0}})
 
-        If objDT_New Is Nothing Then
-            HasData = False
-        ElseIf objDT_New.Rows.Count = 0 Then
-            HasData = False
-        End If
-        If HasData Then
-            Dim VVE_New(,) As Integer
-            VVE_New = clsLib.DT_To_2D_Array(objDT_New)
-            obj3D_New.Plot3D(VVE_New)
+            '-------------------------------------------------------------------------------------------------------------------------
+            ' might want to rethink this as it sets the datatable, etc, might be a performance bummer
+            'Dim objDT_New As DataTable = DisplayVVE() 'DirectCast(grdTune.DataSource, DataTable)
+            Dim objDT_New As DataTable = GetGridManager(grdTune).DataSource
+            '--------------------------------------------------------------------------------------------------------------------
+
+            If objDT_New Is Nothing Then
+                HasData = False
+            ElseIf objDT_New.Rows.Count = 0 Then
+                HasData = False
+            End If
+            If HasData Then
+                Dim VVE_New(,) As Double
+                VVE_New = clsLib.DT_To_2D_Array(objDT_New)
+                obj3D_New.Plot3D(VVE_New)
+            End If
         End If
         ' ---------------------------------------------------------------------------------------
     End Sub
@@ -2291,23 +2303,32 @@ Public Class frmMain
     Private Sub tsTuneBtnSmooth_Click(sender As Object, e As EventArgs) Handles tsTuneBtnSmooth.Click
         Try
             Dim objMath As New clsMath(SMALL_ZONE_WARN)
-            Dim ROW_HEADERS() As String = GetGridManager(grdHisto).RowHeaders_STR
+            'Dim ROW_HEADERS() As String = GetGridManager(grdHisto).RowHeaders_STR
 
             'GetGridManager(grdTune).SetDatatable(objMath.SmoothSelectedCells(grdTune.SelectedCells,
             '                                     GetGridManager(grdTune).DataSource(False)),
             '                                     ROW_HEADERS)
             'CalcCoeffFromBaseVVE(GetGridManager(grdTune).DataSource, ROW_HEADERS, True)
 
+            FORM_STATE = enmFORM_STATE.Loading
 
+            'objMath.GaussianSmoothMAP_FromGrid(grdTune)
+            objMath.GaussianSmoothMAP_FromGridFast(grdTune)
 
-            objMath.GaussianSmoothMAP_FromGrid(grdTune)
-            GetGridManager(grdTune).SetDatatable(GetGridManager(grdTune).DataSource, ROW_HEADERS)
+            GetGridManager(grdTune).ApplyRowHeaders()
+
+            'GetGridManager(grdTune).SetDatatable(GetGridManager(grdTune).DataSource,
+            '                                     GetGridManager(grdHisto).RowHeaders_STR)
+
             'Paint_3D_Graphs()
 
 
 
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical)
+        Finally
+            FORM_STATE = enmFORM_STATE.Normal
+            grd_DataBindingComplete(Nothing, Nothing)
         End Try
     End Sub
 

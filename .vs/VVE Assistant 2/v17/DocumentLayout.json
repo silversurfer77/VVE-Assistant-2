@@ -3,24 +3,23 @@
   "WorkspaceRootPath": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{D6B8AA78-F1E3-4DBC-BD4D-8AE17706F195}|..\\Graph3D\\Graph3D.vbproj|c:\\users\\danku\\source\\repos\\graph3d\\graph3d.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\frmmain.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|solutionrelative:frmmain.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\clsmath.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|solutionrelative:clsmath.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\frmmain.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
       "RelativeMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|solutionrelative:frmmain.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|c:\\users\\danku\\source\\repos\\vve assistant 2\\frmmain.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
-      "RelativeMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|solutionrelative:frmmain.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|c:\\users\\danku\\source\\repos\\vve assistant 2\\clslib.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "AbsoluteMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\clslib.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
       "RelativeMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|solutionrelative:clslib.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|c:\\users\\danku\\source\\repos\\vve assistant 2\\clsmath.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
-      "RelativeMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|solutionrelative:clsmath.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|c:\\users\\danku\\source\\repos\\vve assistant 2\\clszones.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
-      "RelativeMoniker": "D:0:0:{DD2D0790-1D71-45EC-A07F-694A207162C6}|VVE Assistant 2.vbproj|solutionrelative:clszones.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,58 +29,55 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "clsLib.vb",
-              "DocumentMoniker": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\clsLib.vb",
-              "RelativeDocumentMoniker": "clsLib.vb",
-              "ToolTip": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\clsLib.vb",
-              "RelativeToolTip": "clsLib.vb",
-              "ViewState": "AgIAAAMEAAAAAAAAAAAawBQEAABeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-12-09T19:35:13.575Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
               "Title": "clsMath.vb",
               "DocumentMoniker": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\clsMath.vb",
               "RelativeDocumentMoniker": "clsMath.vb",
               "ToolTip": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\clsMath.vb",
               "RelativeToolTip": "clsMath.vb",
-              "ViewState": "AgIAAOsFAAAAAAAAAAAawP8FAAAoAAAAAAAAAA==",
+              "ViewState": "AgIAAPoGAAAAAAAAAAAQwAUHAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-12-09T19:31:19.596Z",
+              "WhenOpened": "2025-12-10T22:10:54.312Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Graph3D.vb",
+              "DocumentMoniker": "C:\\Users\\danku\\source\\repos\\Graph3D\\Graph3D.vb",
+              "RelativeDocumentMoniker": "..\\Graph3D\\Graph3D.vb",
+              "ToolTip": "C:\\Users\\danku\\source\\repos\\Graph3D\\Graph3D.vb",
+              "RelativeToolTip": "..\\Graph3D\\Graph3D.vb",
+              "ViewState": "AgIAACYDAAAAAAAAAAAlwEIDAABnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-12-09T19:56:09.372Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "clsZones.vb",
-              "DocumentMoniker": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\clsZones.vb",
-              "RelativeDocumentMoniker": "clsZones.vb",
-              "ToolTip": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\clsZones.vb",
-              "RelativeToolTip": "clsZones.vb",
-              "ViewState": "AgIAAGwAAAAAAAAAAAAowDsAAABmAAAAAAAAAA==",
+              "Title": "clsLib.vb",
+              "DocumentMoniker": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\clsLib.vb",
+              "RelativeDocumentMoniker": "clsLib.vb",
+              "ToolTip": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\clsLib.vb",
+              "RelativeToolTip": "clsLib.vb",
+              "ViewState": "AgIAAAgCAAAAAAAAAAAlwCACAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-12-09T16:37:06.779Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-09T19:35:13.575Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "frmMain.vb [Design]",
               "DocumentMoniker": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\frmMain.vb",
               "RelativeDocumentMoniker": "frmMain.vb",
               "ToolTip": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\frmMain.vb [Design]",
               "RelativeToolTip": "frmMain.vb [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-12-08T18:52:20.277Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2025-12-08T18:52:20.277Z"
             },
             {
               "$type": "Document",
@@ -91,10 +87,9 @@
               "RelativeDocumentMoniker": "frmMain.vb",
               "ToolTip": "C:\\Users\\danku\\source\\repos\\VVE Assistant 2\\frmMain.vb",
               "RelativeToolTip": "frmMain.vb",
-              "ViewState": "AgIAAEgIAAAAAAAAAAAAwGEIAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAAI4EAAAAAAAAAAAAwKMEAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-12-08T18:52:21.644Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-08T18:52:21.644Z"
             }
           ]
         }

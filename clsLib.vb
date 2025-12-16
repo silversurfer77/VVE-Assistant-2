@@ -524,7 +524,7 @@ Public Class clsLib
 
     'End Sub
 
-    Public Shared Function DT_To_2D_Array(ByVal DT_IN As DataTable) As Integer(,)
+    Public Shared Function DT_To_2D_Array(ByVal DT_IN As DataTable) As Double(,)
         If DT_IN Is Nothing Then
             Return Nothing
         End If
@@ -535,10 +535,10 @@ Public Class clsLib
             Return Nothing
         End If
 
-        Dim VVE(DT_IN.Rows.Count - 1, DT_IN.Columns.Count - 1) As Integer
+        Dim VVE(DT_IN.Rows.Count - 1, DT_IN.Columns.Count - 1) As Double
 
         Dim TEMP_OBJ As Object = Nothing
-        Dim RESULT As Integer = 0
+        Dim RESULT As Double = 0.0
 
         For i As Integer = 0 To DT_IN.Rows.Count - 1
             For j As Integer = 0 To DT_IN.Columns.Count - 1
@@ -546,7 +546,7 @@ Public Class clsLib
                 TEMP_OBJ = DT_IN.Rows(i).Item(j)
                 RESULT = 0
 
-                Integer.TryParse(Math.Round(TEMP_OBJ, 0).ToString, RESULT)
+                Double.TryParse(Math.Round(TEMP_OBJ, 0).ToString, RESULT)
                 VVE(i, j) = RESULT
             Next
         Next
