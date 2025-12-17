@@ -8,6 +8,7 @@
 Imports System.Runtime.InteropServices.ComTypes
 Imports System.Security.AccessControl
 Imports System.Threading
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView
 Imports Graph3D
 Imports Graph3D.Plot3D
 
@@ -57,6 +58,8 @@ Public Class frmMain
 
     Dim ARR_GRD_MIN_AND_MAX_VALUES(-1) As Double
 
+    'Dim ARR_SCATTER_POINTS(,) As Double
+    Dim ARR_SCATTER_POINTS As New List(Of Plot3D.Graph3D.cScatter)
 
 
 
@@ -1241,6 +1244,7 @@ Public Class frmMain
                 Dim VVE_New(,) As Double
                 VVE_New = clsLib.DT_To_2D_Array(objDT_New)
                 obj3D_New.Plot3D(VVE_New)
+                Graph3D_Tune.SetScatterOverlay(ARR_SCATTER_POINTS.ToArray)
             End If
         End If
         ' ---------------------------------------------------------------------------------------
@@ -2085,6 +2089,9 @@ Public Class frmMain
             Dim DT_TARGET_WITH_NULL As DataTable = clsLib.PasteSpecialMultiplyPercent_Datatables(DT_VVE_ADJUSTED_BREAKPOINTS,
                                                                                                  GetGridManager(grdHisto).DataSource,
                                                                                                  True)
+
+            ARR_SCATTER_POINTS = clsLib.DT_TO_SCATTER_PTS(DT_TARGET_WITH_NULL)
+
             DT_TARGET_WITH_INTERPOLATION = DT_TARGET_WITH_NULL
             'End If
 

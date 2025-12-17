@@ -1596,38 +1596,51 @@ Public Class clsMath
 
     Public Function InterpolateInteriorMAP(ByVal DT As DataTable) As DataTable
 
+        Dim startVal As Double = 0
+        Dim startRow As Integer = -1
+        Dim haveStart As Boolean = False
+        Dim r As Integer = 0
+        Dim cur As Double = 0.0
+        Dim endVal As Double = 0.0
+        Dim endRow As Integer = 0
+        Dim steps As Integer = 0
+        Dim t As Double = 0.0
+
+
         For c As Integer = 0 To DT.Columns.Count - 1
 
-            Dim startVal As Double = 0
-            Dim startRow As Integer = -1
-            Dim haveStart As Boolean = False
+            startVal = 0
+            startRow = -1
+            haveStart = False
 
-            Dim r As Integer = 0
+            r = 0
             While r < DT.Rows.Count
 
-                Dim cur As Double = CDbl(DT.Rows(r)(c))
+                If IsNumeric(DT.Rows(r)(c)) Then
+                    cur = CDbl(DT.Rows(r)(c))
 
-                If cur <> 0 Then
-                    If Not haveStart Then
-                        ' first non-zero in this column
-                        startVal = cur
-                        startRow = r
-                        haveStart = True
-                    Else
-                        ' found end of a gap
-                        Dim endVal As Double = cur
-                        Dim endRow As Integer = r
-                        Dim steps As Integer = endRow - startRow
+                    If cur <> 0 Then
+                        If Not haveStart Then
+                            ' first non-zero in this column
+                            startVal = cur
+                            startRow = r
+                            haveStart = True
+                        Else
+                            ' found end of a gap
+                            endVal = cur
+                            endRow = r
+                            steps = endRow - startRow
 
-                        If steps > 1 Then
-                            For k As Integer = startRow + 1 To endRow - 1
-                                Dim t As Double = (k - startRow) / steps
-                                DT.Rows(k)(c) = startVal + (endVal - startVal) * t
-                            Next
+                            If steps > 1 Then
+                                For k As Integer = startRow + 1 To endRow - 1
+                                    t = (k - startRow) / steps
+                                    DT.Rows(k)(c) = startVal + (endVal - startVal) * t
+                                Next
+                            End If
+
+                            startVal = endVal
+                            startRow = r
                         End If
-
-                        startVal = endVal
-                        startRow = r
                     End If
                 End If
 
@@ -1645,17 +1658,27 @@ Public Class clsMath
 
     Public Function InterpolateOneRPMValue(ByVal DT As DataTable) As DataTable
 
+
+        Dim c As Integer = 0
+        'Dim a As Double = 0.0
+        'Dim b As Double = 0.0
+        'Dim d As Double = 0.0
+        Dim a As Object
+        Dim b As Object
+        Dim d As Object
+
+
         For r As Integer = 0 To DT.Rows.Count - 1
 
-            Dim c As Integer = 0
+            c = 0
             While c < DT.Columns.Count - 2
 
-                Dim a As Double = CDbl(DT.Rows(r)(c))
-                Dim b As Double = CDbl(DT.Rows(r)(c + 1))
-                Dim d As Double = CDbl(DT.Rows(r)(c + 2))
+                a = DT.Rows(r)(c)
+                b = DT.Rows(r)(c + 1)
+                d = DT.Rows(r)(c + 2)
 
                 ' pattern: nonzero, zero, nonzero => exactly 1-gap
-                If a <> 0 AndAlso b = 0 AndAlso d <> 0 Then
+                If a IsNot Nothing AndAlso b Is Nothing AndAlso d IsNot Nothing Then
                     DT.Rows(r)(c + 1) = (a + d) / 2.0
                     c += 3 ' skip past interpolated region
                 Else
@@ -1893,39 +1916,60 @@ Public Class clsMath
         ' precompute gaussian weights
         Dim w(window * 2 + 1) As Double
         Dim sumW As Double = 0
+        Dim g As Double = 0.0
         For i As Integer = -window To window
-            Dim g As Double = Math.Exp(-(i * i) / (2 * sigma * sigma))
+            g = Math.Exp(-(i * i) / (2 * sigma * sigma))
             w(i + window) = g
             sumW += g
         Next
 
         Dim rows As Integer = DT.Rows.Count
         Dim cols As Integer = DT.Columns.Count
+        Dim acc As Double = 0.0
+        Dim wsum As Double = 0.0
+        Dim rr As Integer = 0
+        Dim vk As Double = 0.0
+        Dim wk As Double = 0.0
 
         ' output clone
         Dim out = DT.Copy()
 
+        Dim v As Double = 0.0
+
         For c As Integer = 0 To cols - 1
             For r As Integer = 0 To rows - 1
 
-                Dim v As Double = CDbl(DT.Rows(r)(c))
+                If Not IsNumeric(DT.Rows(r)(c)) Then
+                    out.Rows(r)(c) = 0
+                    Continue For
+                End If
+
+                v = CDbl(DT.Rows(r)(c))
                 If v = 0 Then
                     ' leave as is
                     out.Rows(r)(c) = 0
                     Continue For
                 End If
 
-                Dim acc As Double = 0
-                Dim wsum As Double = 0
+                acc = 0
+                wsum = 0
 
                 For k As Integer = -window To window
-                    Dim rr As Integer = r + k
-                    If rr < 0 OrElse rr >= rows Then Continue For
+                    rr = r + k
+                    If rr < 0 OrElse rr >= rows Then
+                        Continue For
+                    End If
 
-                    Dim vk As Double = CDbl(DT.Rows(rr)(c))
-                    If vk = 0 Then Continue For
+                    If Not IsNumeric(DT.Rows(rr)(c)) Then
+                        Continue For
+                    End If
 
-                    Dim wk As Double = w(k + window)
+                    vk = CDbl(DT.Rows(rr)(c))
+                    'If vk = 0 Then
+                    '    Continue For
+                    'End If
+
+                    wk = w(k + window)
                     acc += vk * wk
                     wsum += wk
                 Next

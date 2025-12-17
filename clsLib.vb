@@ -1,6 +1,8 @@
 ﻿
 Imports System.IO
 'Imports Graph3D
+Imports Graph3D
+Imports Graph3D.Plot3D.Graph3D
 
 
 Public Class clsLib
@@ -587,6 +589,56 @@ Public Class clsLib
         Return VVE
     End Function
 
+    Public Shared Function DT_TO_SCATTER_PTS(ByVal DT_IN As DataTable) As List(Of Plot3D.Graph3D.cScatter)
+        If DT_IN Is Nothing Then
+            Return Nothing
+        End If
+        If DT_IN.Rows.Count = 0 Then
+            Return Nothing
+        End If
+        If DT_IN.Columns.Count = 0 Then
+            Return Nothing
+        End If
+
+        Dim pts As New List(Of Plot3D.Graph3D.cScatter)
+
+        'Dim TEMP_OBJ As Object = Nothing
+        'Dim RESULT As Integer = 0
+
+        For x As Integer = 0 To DT_IN.Columns.Count - 1
+            DT_IN.Columns(x).AllowDBNull = True
+
+            For y As Integer = 0 To DT_IN.Rows.Count - 1
+
+                If IsNumeric(DT_IN.Rows(y).Item(x)) Then
+                    pts.Add(New cScatter(y, x, CDbl(DT_IN.Rows(y).Item(x)), Brushes.Red))
+                Else
+                    pts.Add(New cScatter(y, x, Nothing, Brushes.Red))
+                End If
+
+                'TEMP_OBJ = DT_IN.Rows(y).Item(x).Rows(y).Item(x)
+                'RESULT = 0
+                'Double.TryParse(Math.Round(TEMP_OBJ, 2).ToString, RESULT)
+
+
+                'If RESULT = 0.0 Then
+                '    pts.Add(New cScatter(y, x, Nothing, Brushes.Red))
+                'Else
+                '    pts.Add(New cScatter(y, x, RESULT, Brushes.Red))
+                'End If
+
+
+                'If rawPoint.HasValue Then
+                '    pts.Add(New cScatter(x, y, rawPoint.Value, Brushes.Red))
+                'Else
+                '    pts.Add(New cScatter(x, y, Double.NaN, Nothing))
+                'End If
+            Next
+        Next
+
+        Return pts
+    End Function
+
     Public Shared Function DT_To_1D_Array_DBL(ByVal DT_IN As DataTable) As Double()
         ' this is used to pass in MAP zone data to the 3D chart.
         ' the ROW and COL loops are reversed as compared to DT_To_2D_Array()!!!
@@ -944,6 +996,7 @@ Public Class clsLib
 
         For i As Integer = 0 To DT_NEW.Rows.Count - 1
             For j As Integer = 0 To DT_NEW.Columns.Count - 1
+                DT_NEW.Columns(j).AllowDBNull = True
 
                 VVE = DT_NEW.Rows(i).Item(j)
                 ERR = DT_ERR.Rows(i).Item(j)
@@ -953,7 +1006,8 @@ Public Class clsLib
                     VVE = VVE + (VVE * ERR)
                     DT_NEW.Rows(i).Item(j) = VVE
                 ElseIf FORCE_ZERO_IF_ERR_VALUE_DNE Then
-                    DT_NEW.Rows(i).Item(j) = 0 'DBNull.Value
+                    'DT_NEW.Rows(i).Item(j) = 0
+                    DT_NEW.Rows(i).Item(j) = DBNull.Value
                 End If
             Next
         Next
